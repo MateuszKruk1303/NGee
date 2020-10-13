@@ -9,7 +9,6 @@ export abstract class ItemsController {
       console.log(err)
       res.status(500).json({ status: 'Error' })
     }
-    next()
   }
   public static async getItemByName(req: any, res: any, next: any) {
     try {
@@ -19,7 +18,6 @@ export abstract class ItemsController {
       console.log(err)
       res.status(500).json({ status: 'Error' })
     }
-    next()
   }
   public static async addNewItem(req: any, res: any, next: any) {
     try {
@@ -29,7 +27,6 @@ export abstract class ItemsController {
       console.log(err)
       res.status(500).json({ status: 'Error' })
     }
-    next()
   }
   public static async deleteItemByName(req: any, res: any, next: any) {
     try {
@@ -39,7 +36,6 @@ export abstract class ItemsController {
       console.log(err)
       res.status(500).json({ status: 'Error' })
     }
-    next()
   }
   public static async updateItemByName(req: any, res: any, next: any) {
     try {
