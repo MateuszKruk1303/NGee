@@ -4,6 +4,7 @@ import itemRoutes from './routes/item.routes'
 import userRoutes from './routes/user.routes'
 import { ServerError, ErrorHandler } from './utils/serverError'
 import dotenv from 'dotenv'
+import cors from 'cors'
 
 dotenv.config({ path: './process.env' })
 
@@ -13,8 +14,8 @@ mongoose.connect(DB)
 
 const app = express()
 
+app.use(cors())
 app.use(express.json())
-
 app.use('/items', itemRoutes)
 app.use('/user', userRoutes)
 

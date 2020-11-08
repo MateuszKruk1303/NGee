@@ -1,11 +1,12 @@
 import express from 'express'
 import { ItemsController } from '../controllers/item.controller'
+import { UserController } from '../controllers/user.controller'
 
 const router = express.Router()
 
 router
   .route('/')
-  .get(ItemsController.getAllItems)
+  .get(UserController.Authorize, ItemsController.getAllItems)
   .post(ItemsController.addNewItem)
 
 router
