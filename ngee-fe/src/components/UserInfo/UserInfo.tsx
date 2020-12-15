@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Avatar,
   IconButton,
@@ -12,24 +12,32 @@ import { RootState } from '../../store/types'
 import { logout } from '../../store/login/reducers'
 import { Link } from 'react-router-dom'
 
-export default () => {
+export default ({
+  userId,
+  name,
+  profilePicture,
+}: {
+  userId: string
+  name: string | null
+  profilePicture: string | null
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-  const user = useSelector((state: RootState) => state.login)
   const dispatch = useDispatch()
   const handleLogout = () => {
     dispatch(logout(null))
   }
+
   return (
     <div>
       <Grid container wrap="nowrap" alignItems="center">
-        <Typography>{user.name}</Typography>
+        <Typography>{name}</Typography>
         <IconButton
           onClick={e => {
             setAnchorEl(e.currentTarget)
           }}
         >
-          <Avatar>T</Avatar>
+          <Avatar src={profilePicture ? profilePicture : ''} />
         </IconButton>
       </Grid>
       <Menu open={open} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { AppBar, Grid, Button, Typography } from '@material-ui/core'
-import RegisterDialog from '../../modules/User/LoginAndRegister'
+import { Grid, Button } from '@material-ui/core'
+import RegisterDialog from '../../modules/LoginAndRegister/LoginAndRegister'
+import { AppBar, Typography } from './AppBar.style'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../store/types'
 import UserInfo from '../UserInfo'
@@ -8,18 +9,24 @@ import { Link } from 'react-router-dom'
 
 export default () => {
   const [isDialogOpened, setDialogOpen] = useState(false)
-  const isLoggedIn = useSelector((state: RootState) => state.login.userId)
+  const user = useSelector((state: RootState) => state.login)
   return (
-    <AppBar position="sticky">
+    <AppBar position="fixed">
       <Grid container justify="space-between" alignItems="center">
         <Grid item>
           <Link to="/">
-            <Typography>Ngee :)</Typography>
+            <Typography variant="h6" className="title">
+              NGee
+            </Typography>
           </Link>
         </Grid>
         <Grid item>
-          {isLoggedIn ? (
-            <UserInfo />
+          {user.userId ? (
+            <UserInfo
+              userId={user.userId}
+              name={user.name}
+              profilePicture={user.profilePicture}
+            />
           ) : (
             <Button onClick={() => setDialogOpen(true)}>Login</Button>
           )}
