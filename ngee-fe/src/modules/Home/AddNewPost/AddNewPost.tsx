@@ -18,6 +18,7 @@ import {
   FormControl,
   Chip,
   SelectFile,
+  Wrapper,
 } from './AddNewPost.style'
 import { Formik } from 'formik'
 import CloseIcon from '@material-ui/icons/Close'
@@ -25,24 +26,44 @@ import AddIcon from '@material-ui/icons/Add'
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../store/types'
-import { addNewPost } from '../../../store/posts/thunks'
+import { addNewPost, editPost } from '../../../store/posts/thunks'
 import { Category } from '@material-ui/icons'
 
 interface IAddNewPost {
   onClose: () => void
+  title?: string
+  content?: string
+  existingTags?: string[]
+  existingCategory?: string
+  postId?: string
 }
 
-export default ({ onClose }: IAddNewPost) => {
+export default ({
+  onClose,
+  title,
+  content,
+  existingTags,
+  existingCategory,
+  postId,
+}: IAddNewPost) => {
   const userId = useSelector((state: RootState) => state.login.userId)
   const [selectedFile, setSelectedFile] = useState<null | FileList>(null)
-  const [tags, setTags] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>(existingTags ? existingTags : [])
   const [tag, setTag] = useState<string>('')
-  const [category, setCategory] = useState<string>('Automation')
+  const [category, setCategory] = useState<string>(
+    existingCategory ? existingCategory : 'Automation'
+  )
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const isMenuOpen = Boolean(anchorEl)
   const dispatch = useDispatch()
 
-  const onSubmit = ({ title, content }: { title: string; content: string }) => {
+  const onSubmitAdd = ({
+    title,
+    content,
+  }: {
+    title: string
+    content: string
+  }) => {
     const fd = new FormData()
 
     if (selectedFile) {
@@ -58,6 +79,27 @@ export default ({ onClose }: IAddNewPost) => {
     fd.append('category', category)
     dispatch(addNewPost({ dto: fd }))
   }
+  const onSubmitEdit = ({
+    title,
+    content,
+  }: {
+    title: string
+    content: string
+  }) => {
+    if (userId && postId)
+      dispatch(
+        editPost({
+          dto: {
+            userId,
+            postId,
+            title,
+            content,
+            category,
+            tags,
+          },
+        })
+      )
+  }
   const handleAddTag = (e: any) => {
     if (tag?.length > 0 && !tags.includes(e) && tags.length < 5) {
       setTags([...tags, e])
@@ -70,19 +112,18 @@ export default ({ onClose }: IAddNewPost) => {
   }
 
   const initialValues = {
-    title: '',
-    content: '',
-    category: 'Automation',
+    title: title ? title : '',
+    content: content ? content : '',
   }
 
   return (
-    <div style={{ width: '340px' }}>
+    <Wrapper>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={(data, { resetForm }) => {
           resetForm()
-          onSubmit(data)
+          postId ? onSubmitEdit(data) : onSubmitAdd(data)
           onClose()
         }}
       >
@@ -93,7 +134,7 @@ export default ({ onClose }: IAddNewPost) => {
               direction="column"
               alignItems="center"
               justify="center"
-              spacing={4}
+              spacing={2}
             >
               <Grid item>
                 <Typography variant="subtitle1">Title</Typography>
@@ -132,6 +173,7 @@ export default ({ onClose }: IAddNewPost) => {
                   <MenuItem value="Automation">Automation</MenuItem>
                   <MenuItem value="Robotics">Robotics</MenuItem>
                   <MenuItem value="College">College</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
                 </Select>
               </Grid>
               <Grid item>
@@ -184,14 +226,16 @@ export default ({ onClose }: IAddNewPost) => {
                 <Typography variant="subtitle1">Add photos</Typography>
               </Grid>
               <Grid item>
-                <SelectFile
-                  type="file"
-                  onChange={e => {
-                    setSelectedFile(e.target.files)
-                  }}
-                  name="profileimage"
-                  multiple
-                ></SelectFile>
+                {!postId && (
+                  <SelectFile
+                    type="file"
+                    onChange={e => {
+                      setSelectedFile(e.target.files)
+                    }}
+                    name="profileimage"
+                    multiple
+                  ></SelectFile>
+                )}
               </Grid>
               <Grid item>
                 <Grid container justify="center" spacing={3}>
@@ -209,6 +253,6 @@ export default ({ onClose }: IAddNewPost) => {
           </form>
         )}
       </Formik>
-    </div>
+    </Wrapper>
   )
 }

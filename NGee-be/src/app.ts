@@ -1,6 +1,5 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import itemRoutes from './routes/item.routes'
 import userRoutes from './routes/user.routes'
 import postRoutes from './routes/post.routes'
 import { ServerError, ErrorHandler } from './utils/serverError'
@@ -27,8 +26,6 @@ app.use(
   express.static(path.resolve(`./src/images/ClientUploads/PostPictures/`))
 )
 app.use(express.json())
-// app.use(bodyParser.json())
-app.use('/items', itemRoutes)
 app.use('/user', userRoutes)
 app.use('/posts', postRoutes)
 

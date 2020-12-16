@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../store/types'
 import UserInfo from '../UserInfo'
 import { Link } from 'react-router-dom'
+import Notifications from '../Notifications'
 
 export default () => {
   const [isDialogOpened, setDialogOpen] = useState(false)
@@ -15,20 +16,25 @@ export default () => {
       <Grid container justify="space-between" alignItems="center">
         <Grid item>
           <Link to="/">
-            <Typography variant="h6" className="title">
+            <Typography variant="h4" className="title">
               NGee
             </Typography>
           </Link>
         </Grid>
         <Grid item>
           {user.userId ? (
-            <UserInfo
-              userId={user.userId}
-              name={user.name}
-              profilePicture={user.profilePicture}
-            />
+            <Grid container>
+              <Notifications />
+              <UserInfo
+                userId={user.userId}
+                name={user.name}
+                profilePicture={user.profilePicture}
+              />
+            </Grid>
           ) : (
-            <Button onClick={() => setDialogOpen(true)}>Login</Button>
+            <Button onClick={() => setDialogOpen(true)}>
+              <Typography variant="body2">Login</Typography>
+            </Button>
           )}
         </Grid>
       </Grid>

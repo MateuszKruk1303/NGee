@@ -29,7 +29,7 @@ export default ({
   }
 
   return (
-    <div>
+    <div style={{ paddingLeft: 20 }}>
       <Grid container wrap="nowrap" alignItems="center">
         <Typography>{name}</Typography>
         <IconButton

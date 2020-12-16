@@ -7,7 +7,9 @@ import { TextField, Grid, Button } from '@material-ui/core'
 import GenericCard from '../UserProfile/GenericProfileActionCard'
 import { validationSchema } from './ResetPasswordPage.utils'
 import { onSubmit } from './ResetPasswordPage.utils'
-
+import { useSelector } from 'react-redux'
+import { RootState } from '../../store/types'
+import Snackbar from '../../components/Snackbar'
 export interface IFormValues {
   newPassword: string
   newPasswordConfirm: string
@@ -21,9 +23,11 @@ const initialValues: IFormValues = {
 export default () => {
   const dispatch = useDispatch()
   const { emergencyId } = useParams()
+  const error = useSelector((state: RootState) => state.login.error)
 
   return (
     <Wrapper>
+      {error && <Snackbar isError={true} message={error} />}
       <GenericCard title="Reset your password" actionsAvailable={false}>
         <Formik
           initialValues={initialValues}

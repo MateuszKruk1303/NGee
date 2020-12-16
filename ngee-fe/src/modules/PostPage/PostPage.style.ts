@@ -30,9 +30,16 @@ export const SendButton = styled(IconButton)(() => ({
   bottom: 0,
   right: 0,
 }))
-export const TextField = styled(BaseTextField)(() => ({
+export const CancelButton = styled(IconButton)(() => ({
+  position: 'absolute',
+  zIndex: 2000,
+  bottom: 0,
+  right: 50,
+}))
+export const TextField = styled(BaseTextField)(({ theme }) => ({
   width: '100%',
+  marginTop: 20,
   '& .MuiInputBase-input': {
-    paddingRight: 25,
+    paddingRight: 70,
   },
 }))

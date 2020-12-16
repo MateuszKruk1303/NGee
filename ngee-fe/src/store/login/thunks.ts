@@ -9,7 +9,10 @@ import {
   IDeleteAccount,
   IResetPassword,
   IOrderResetPassword,
+  IGetNotifications,
+  INotificationUpdate,
 } from '../../utils/login'
+import { Notification } from '../types'
 import api from '../../utils/api'
 
 interface ILoginUserInfoResponse {
@@ -23,10 +26,46 @@ interface ILoginResponse {
   data: ILoginUserInfoResponse
 }
 
+interface IGetNotificationsResponse {
+  data: {
+    notifications: Notification[]
+  }
+}
+interface INotificationUpdateResponse {
+  data: {
+    notificationId: string
+  }
+}
+
+export const getNotifications = createAsyncThunk<
+  { response: IGetNotificationsResponse },
+  { dto: IGetNotifications },
+  { rejectValue: any }
+>('getNotifications', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.getNotifications(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+export const notificationUpdate = createAsyncThunk<
+  { response: INotificationUpdateResponse },
+  { dto: INotificationUpdate },
+  { rejectValue: any }
+>('notificationUpdate', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.notificationUpdate(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+
 export const login = createAsyncThunk<
   { response: ILoginResponse },
   { dto: ILogin },
-  { rejectValue: string }
+  { rejectValue: any }
 >('login', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.login(dto)
@@ -39,7 +78,7 @@ export const login = createAsyncThunk<
 export const register = createAsyncThunk<
   { response: ILoginResponse },
   { dto: IRegister },
-  { rejectValue: string }
+  { rejectValue: any }
 >('register', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.register(dto)
@@ -52,7 +91,7 @@ export const register = createAsyncThunk<
 export const uploadPhoto = createAsyncThunk<
   { response: { data: { photo: string } } },
   { dto: FormData },
-  { rejectValue: string }
+  { rejectValue: any }
 >('uploadPhoto', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.uploadPhoto(dto)
@@ -65,7 +104,7 @@ export const uploadPhoto = createAsyncThunk<
 export const activateAccount = createAsyncThunk<
   { response: { status: string } },
   { dto: IActivateAccount },
-  { rejectValue: string }
+  { rejectValue: any }
 >('activateAccount', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.activateAccount(dto)
@@ -77,7 +116,7 @@ export const activateAccount = createAsyncThunk<
 export const changeEmail = createAsyncThunk<
   { response: { status: string } },
   { dto: IChangeEmail },
-  { rejectValue: string }
+  { rejectValue: any }
 >('changeEmail', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.changeEmail(dto)
@@ -89,7 +128,7 @@ export const changeEmail = createAsyncThunk<
 export const changePassword = createAsyncThunk<
   { response: { status: string } },
   { dto: IChangePassword },
-  { rejectValue: string }
+  { rejectValue: any }
 >('changePassword', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.changePassword(dto)
@@ -101,7 +140,7 @@ export const changePassword = createAsyncThunk<
 export const changeNickname = createAsyncThunk<
   { response: { data: { name: string } } },
   { dto: IChangeNickname },
-  { rejectValue: string }
+  { rejectValue: any }
 >('changeNickname', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.changeNickname(dto)
@@ -113,7 +152,7 @@ export const changeNickname = createAsyncThunk<
 export const deleteAccount = createAsyncThunk<
   { response: { status: string } },
   { dto: IDeleteAccount },
-  { rejectValue: string }
+  { rejectValue: any }
 >('deleteAccount', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.deleteAccount(dto)
@@ -125,7 +164,7 @@ export const deleteAccount = createAsyncThunk<
 export const orderResetPassword = createAsyncThunk<
   { response: { status: string } },
   { dto: IOrderResetPassword },
-  { rejectValue: string }
+  { rejectValue: any }
 >('orderResetPassword', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.orderResetPassword(dto)
@@ -137,7 +176,7 @@ export const orderResetPassword = createAsyncThunk<
 export const resetPassword = createAsyncThunk<
   { response: { status: string } },
   { dto: IResetPassword },
-  { rejectValue: string }
+  { rejectValue: any }
 >('resetPassword', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.resetPassword(dto)

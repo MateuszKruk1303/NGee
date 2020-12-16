@@ -1,4 +1,10 @@
 import { UserModel, IUserModel } from '../models/user.model'
+import { CommentModel, ICommentModel } from '../models/comment.model'
+import { PostModel, IPostModel } from '../models/post.model'
+import {
+  NotificationModel,
+  INotificationModel,
+} from '../models/notification.model'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { Request, Response, NextFunction } from 'express'
@@ -6,6 +12,7 @@ import { promisify } from 'util'
 import { processProfilePhoto } from '../utils/imageProcessing'
 import { normalizeImagePath } from '../utils/normalizeImagePath'
 import mailSender from '../services/MailingService'
+import { v4 } from 'uuid'
 
 const generateJwt = (id: string) => {
   return jwt.sign({ id }, process.env['JWT_SECRET'] as string, {
@@ -17,8 +24,8 @@ export class UserController {
   public static async signUp(req: Request, res: Response) {
     try {
       const { name, email, photo, password, passwordConfirm } = req.body
-      const activationHash =
-        Math.random() + Math.random() * 100000000000000000000
+      if (!name || !email || !password || !passwordConfirm) throw 'error'
+      const activationHash = v4()
       await UserModel.create({
         name: name,
         email: email,
@@ -37,7 +44,7 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async login(req: Request, res: Response) {
@@ -48,15 +55,12 @@ export class UserController {
       const user: IUserModel | null = (await UserModel.findOne({
         email: email,
       })) as IUserModel
-      console.log(user)
-      if (!user || !user.activated) throw 'Fail'
+      if (!user || !user.activated) throw 'User does not exist'
       //Never trust error with await like below.
       const correct: boolean = await user.comparePasswords(
         password,
         user.password
       )
-      console.log(password)
-      console.log(correct)
       if (correct) {
         const token = generateJwt(user.id)
         res.status(201).json({
@@ -67,15 +71,16 @@ export class UserController {
             photo: normalizeImagePath(user.photo),
           },
         })
-      } else throw 'Fail'
+      } else throw 'Wrong password or email'
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async activateProfile(req: Request, res: Response) {
     try {
       const { activationHash } = req.body
+      if (!activationHash) throw 'error'
       const user = (await UserModel.findOne({
         accountActivationHash: activationHash,
       })) as IUserModel
@@ -87,11 +92,12 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async uploadPhoto(req: Request, res: Response) {
     try {
+      if (!req.body.userId) throw 'error'
       const user = (await UserModel.findOne({
         _id: req.body.userId,
       })) as IUserModel
@@ -109,19 +115,24 @@ export class UserController {
       res.status(200).json({ data: { photo: `${req.file.originalname}.jpg` } })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async changeEmail(req: Request, res: Response) {
     try {
       const { userId, email, password } = req.body
-      const activationHash =
-        Math.random() + Math.random() * 100000000000000000000
+      if (!email || !password || !userId) throw 'error'
+      const activationHash = v4()
 
       const user = (await UserModel.findOne({
         _id: userId,
       })) as IUserModel
       if (!user) throw 'There is no user with this id'
+      const isEmailTaken = (await UserModel.findOne({
+        email: email,
+      })) as IUserModel
+
+      if (isEmailTaken) throw 'Email taken'
       //Never trust error with await like below.
       const correct: boolean = await user!.comparePasswords(
         password,
@@ -146,12 +157,14 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async changePassword(req: Request, res: Response) {
     try {
       const { userId, oldPassword, newPassword, newPasswordConfirm } = req.body
+      if (!userId || !oldPassword || !newPassword || !newPasswordConfirm)
+        throw 'error'
       const user = (await UserModel.findOne({
         _id: userId,
       })) as IUserModel
@@ -177,12 +190,13 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async changeNickname(req: Request, res: Response) {
     try {
       const { userId, newNickname, password } = req.body
+      if (!newNickname || !password || !userId) throw 'error'
       const user = (await UserModel.findById(userId)) as IUserModel
       if (!user) throw 'There is no user with this id'
       //Never trust error with await like below.
@@ -198,12 +212,13 @@ export class UserController {
       res.status(201).json({ data: { name: newNickname } })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async deleteAccount(req: Request, res: Response) {
     try {
       const { userId, password } = req.body
+      if (!userId || !password) throw 'error'
       const user = (await UserModel.findById(userId)) as IUserModel
       if (!user) throw 'There is no user with this id'
       //Never trust error with await like below.
@@ -212,22 +227,35 @@ export class UserController {
         user.password
       )
       if (!correct) throw 'Wrong Password'
+      const userPosts = await PostModel.find({ createdBy: userId })
+      const userComments = await CommentModel.find({ createdBy: userId })
+      await Promise.all(
+        userPosts.map(async (post) => {
+          await PostModel.deleteOne({ _id: post._id })
+        })
+      )
+      await Promise.all(
+        userComments.map(async (comment) => {
+          await CommentModel.deleteOne({ _id: comment._id })
+        })
+      )
       await UserModel.deleteOne({ _id: userId })
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
 
   public static async orderResetPassword(req: Request, res: Response) {
     try {
       const { email } = req.body
+      if (!email) throw 'error'
       const user = (await UserModel.findOne({
         email,
       })) as IUserModel
       if (!user) throw 'There is no user with this id'
-      const emergencyId = Math.random() + Math.random() * 100000000000000000000
+      const emergencyId = v4()
       await UserModel.updateOne(
         { _id: user.id },
         { $set: { emergencyId: emergencyId } }
@@ -240,13 +268,14 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
 
   public static async resetPassword(req: Request, res: Response) {
     try {
       const { emergencyId, newPassword, newPasswordConfirm } = req.body
+      if (!emergencyId || !newPassword || !newPasswordConfirm) throw 'error'
       const user = (await UserModel.findOne({
         emergencyId: emergencyId,
       })) as IUserModel
@@ -267,7 +296,54 @@ export class UserController {
       res.status(201).json({ status: 'Success' })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
+    }
+  }
+  public static async notificationUpdate(req: Request, res: Response) {
+    try {
+      const { userId, notificationId } = req.body
+      if (!userId) throw 'error'
+      const user = (await UserModel.findById(userId)) as IUserModel
+      if (!user) throw 'There is no user with this id'
+      await NotificationModel.updateOne(
+        {
+          _id: notificationId,
+        },
+        {
+          $set: {
+            watched: true,
+          },
+        }
+      )
+      res.status(201).json({ data: { notificationId } })
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
+
+  public static async getNotifications(req: Request, res: Response) {
+    try {
+      const { userId } = req.body
+      if (!userId) throw 'error'
+      const notifications = ((await NotificationModel.find(
+        {
+          userId: userId,
+        },
+        {},
+        { sort: { date: -1 } }
+      )) as unknown) as INotificationModel[]
+      console.log(notifications)
+      res.status(201).json({
+        data: {
+          notifications: notifications.filter(
+            (notification, index) => index <= 5
+          ),
+        },
+      })
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
     }
   }
 
@@ -285,10 +361,10 @@ export class UserController {
         const token = req.headers.authorization.split(' ')[1]
         if (!token) throw 'Token not found, please log in'
 
-        const verified = (await promisify(jwt.verify)(
+        const verified = ((await promisify(jwt.verify)(
           token,
           process.env['JWT_SECRET'] as string
-        )) as { id: string; iat: number; exp: number }
+        )) as unknown) as { id: string; iat: number; exp: number }
 
         const isUserAlive = await UserModel.findById(verified.id)
 
@@ -298,7 +374,7 @@ export class UserController {
       }
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
     next()
   }

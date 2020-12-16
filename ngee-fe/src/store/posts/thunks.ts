@@ -32,7 +32,7 @@ interface IAddPostResponse {
 export const getAllPosts = createAsyncThunk<
   { response: IGetAllPostsResponse },
   { dto: { actualPage: number } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('getAllPosts', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.getAllPosts(dto)
@@ -42,10 +42,36 @@ export const getAllPosts = createAsyncThunk<
   }
 })
 
+export const getUserPosts = createAsyncThunk<
+  { response: IGetAllPostsResponse },
+  { dto: { actualPage: number; userId: string } },
+  { rejectValue: any }
+>('getUserPosts', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.getUserPosts(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+
+export const searchPosts = createAsyncThunk<
+  { response: IGetAllPostsResponse },
+  { dto: { keyWord: string; actualPage: number } },
+  { rejectValue: any }
+>('searchPosts', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.searchPosts(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+
 export const getPostById = createAsyncThunk<
   { response: IGetPostByIdResponse },
   { dto: { postId: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('getPostById', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.getPostById(dto)
@@ -58,7 +84,7 @@ export const getPostById = createAsyncThunk<
 export const addNewPost = createAsyncThunk<
   { response: IAddPostResponse },
   { dto: FormData },
-  { rejectValue: string }
+  { rejectValue: any }
 >('addNewPost', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.addNewPost(dto)
@@ -71,7 +97,7 @@ export const addNewPost = createAsyncThunk<
 export const addVote = createAsyncThunk<
   { response: { data: { votes: [] } } },
   { dto: { postId: string; userId: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('addVote', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.addVote(dto)
@@ -81,9 +107,22 @@ export const addVote = createAsyncThunk<
   }
 })
 export const editPost = createAsyncThunk<
-  { response: { data: { title: string; content: string } } },
-  { dto: { postId: string; userId: string; content: string; title: string } },
-  { rejectValue: string }
+  {
+    response: {
+      data: { title: string; content: string; category: string; tags: string[] }
+    }
+  },
+  {
+    dto: {
+      postId: string
+      userId: string
+      content: string
+      title: string
+      category: string
+      tags: string[]
+    }
+  },
+  { rejectValue: any }
 >('editPost', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.editPost(dto)
@@ -95,7 +134,7 @@ export const editPost = createAsyncThunk<
 export const deletePost = createAsyncThunk<
   { response: { data: string } },
   { dto: { postId: string; userId: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('deletePost', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.deletePost(dto)
@@ -107,7 +146,7 @@ export const deletePost = createAsyncThunk<
 export const addComment = createAsyncThunk<
   { response: { data: Comment; postId: string } },
   { dto: { postId: string; userId: string; content: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('addComment', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.addComment(dto)
@@ -119,7 +158,7 @@ export const addComment = createAsyncThunk<
 export const addVoteToComment = createAsyncThunk<
   { response: { data: { votes: []; commentId: string } } },
   { dto: { commentId: string; userId: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('addVoteToComment', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.addCommentVote(dto)
@@ -131,10 +170,43 @@ export const addVoteToComment = createAsyncThunk<
 export const tagAsSolution = createAsyncThunk<
   { response: { data: { commentId: string; postId: string } } },
   { dto: { postId: string; commentId: string; userId: string } },
-  { rejectValue: string }
+  { rejectValue: any }
 >('tagAsSolution', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.tagAsSolution(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+export const editComment = createAsyncThunk<
+  {
+    response: { data: { commentId: string; content: string } }
+  },
+  {
+    dto: { commentId: string; userId: string; postId: string; content: string }
+  },
+  { rejectValue: any }
+>('editComment', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.editComment(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+
+export const deleteComment = createAsyncThunk<
+  {
+    response: { data: { commentId: string } }
+  },
+  {
+    dto: { commentId: string; userId: string; postId: string }
+  },
+  { rejectValue: any }
+>('deleteComment', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.deleteComment(dto)
     return { response: response.data }
   } catch (err) {
     return thunkAPI.rejectWithValue(err)

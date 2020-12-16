@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { getPostById, addVote, addComment } from '../../store/posts/thunks'
+import {
+  getPostById,
+  addVote,
+  addComment,
+  deletePost,
+  editPost,
+} from '../../store/posts/thunks'
 import { RootState } from '../../store/types'
 import {
   Typography,
@@ -10,6 +16,8 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Menu,
+  MenuItem,
 } from '@material-ui/core'
 import {
   Card,
@@ -23,6 +31,10 @@ import { StatusChip, TagChip } from '../Home/PostContainer/Post/Post.style'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import Comment from './Comment'
 import SendIcon from '@material-ui/icons/Send'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+import GenericDialog from '../../components/GenericDialog'
+import AddPostForm from '../Home/AddNewPost'
+import SpinnerLoader from '../../components/SpinnerLoader'
 
 export const normalizeImagePath = (imagePath: string) => {
   if (imagePath) return imagePath.split('\\')[imagePath.split('\\').length - 1]
@@ -35,12 +47,18 @@ export default () => {
   const [isImgModalOpen, setImgModalOpen] = useState(false)
   const [modalPhoto, setModalPhoto] = useState('')
   const [comment, setComment] = useState('')
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false)
+  const open = Boolean(anchorEl)
 
   useEffect(() => {
     dispatch(getPostById({ dto: { postId } }))
   }, [getPostById])
   const post = useSelector((state: RootState) => state.post.post)
   const userId = useSelector((state: RootState) => state.login.userId)
+  const isLoading = useSelector((state: RootState) => state.post.isLoading)
+
+  const isCreator = post?.createdBy.userId == userId
 
   const postPicturePath = (photo: string) =>
     `${process.env.REACT_APP_BACKEND_URL}/postPictures/${photo}`
@@ -59,8 +77,14 @@ export default () => {
       setComment('')
     }
   }
+
+  const handleDeletePost = () => {
+    if (userId) dispatch(deletePost({ dto: { postId, userId } }))
+  }
   return (
     <Wrapper>
+      <SpinnerLoader isLoading={isLoading} />
+
       <Card>
         {post && (
           <Grid container direction="column" spacing={4}>
@@ -110,7 +134,9 @@ export default () => {
             <Grid item>
               <Grid container wrap="nowrap" justify="center">
                 <Grid item>
-                  <Typography variant="h4">{post.title}</Typography>
+                  <Typography variant="h5" style={{ textAlign: 'center' }}>
+                    {post.title}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>
@@ -149,7 +175,13 @@ export default () => {
               </Grid>
             </Grid>
             <Grid item>
-              <Grid container spacing={3} justify="space-between">
+              <Grid
+                container
+                spacing={3}
+                justify="space-between"
+                alignItems="center"
+                wrap="nowrap"
+              >
                 <Grid item>
                   <Typography variant="body2" style={{ paddingBottom: 4 }}>
                     tags:
@@ -159,15 +191,36 @@ export default () => {
                   ))}
                 </Grid>
                 <Grid item>
-                  <IconButton onClick={handleAddLike} style={{ padding: 0 }}>
-                    <Typography style={{ paddingRight: 3 }}>Like</Typography>
-                    <FavoriteIcon
-                      style={{ color: isLiked() ? 'red' : 'initial' }}
-                    />
-                    <Typography style={{ paddingLeft: 3 }}>
-                      {post.votes.length}
-                    </Typography>
-                  </IconButton>
+                  <Grid
+                    container
+                    wrap="nowrap"
+                    alignItems="center"
+                    style={{ paddingTop: 20 }}
+                  >
+                    <Grid item>
+                      <IconButton
+                        onClick={handleAddLike}
+                        style={{ padding: 0 }}
+                      >
+                        <Typography style={{ paddingRight: 3 }}>
+                          Like
+                        </Typography>
+                        <FavoriteIcon
+                          style={{ color: isLiked() ? 'red' : 'initial' }}
+                        />
+                        <Typography style={{ paddingLeft: 3 }}>
+                          {post.votes.length}
+                        </Typography>
+                      </IconButton>
+                    </Grid>
+                    <Grid item>
+                      {isCreator && (
+                        <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      )}
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -176,7 +229,7 @@ export default () => {
             </Grid>
             <Grid item>
               <Grid container>
-                {!post.closed && (
+                {!post.closed && userId && (
                   <TextFieldWrapper>
                     <SendButton onClick={handleAddComment}>
                       <SendIcon />
@@ -196,6 +249,7 @@ export default () => {
                 )}
                 {post.comments.map(comment => (
                   <Comment
+                    postCreatorId={post.createdBy.userId}
                     postId={post.postId}
                     closed={post.closed}
                     {...comment}
@@ -214,6 +268,29 @@ export default () => {
       >
         <img src={postPicturePath(normalizeImagePath(modalPhoto) as string)} />
       </Dialog>
+
+      <GenericDialog
+        title="Edit post"
+        open={isEditDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        isBig={true}
+      >
+        <AddPostForm
+          title={post?.title}
+          content={post?.content}
+          existingTags={post?.tags}
+          existingCategory={post?.category}
+          postId={postId}
+          onClose={() => {
+            setEditDialogOpen(false)
+            setAnchorEl(null)
+          }}
+        />
+      </GenericDialog>
+      <Menu open={open} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
+        <MenuItem onClick={() => setEditDialogOpen(true)}>Edit post</MenuItem>
+        <MenuItem onClick={handleDeletePost}>Delete post</MenuItem>
+      </Menu>
     </Wrapper>
   )
 }

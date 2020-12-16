@@ -17,12 +17,21 @@ import {
 
 const tagColors = [teal[100], purple[100], green[100], blue[100], lime[100]]
 
-export const TextField = styled(BaseTextField)(() => ({
+export const TextField = styled(BaseTextField)(({ theme }) => ({
   width: 300,
+  [theme.breakpoints.down('sm')]: {
+    width: 200,
+    minWidth: 200,
+    maxWidth: 200,
+  },
 }))
 
-export const Select = styled(BaseSelect)(() => ({
+export const Select = styled(BaseSelect)(({ theme }) => ({
   minWidth: 300,
+  [theme.breakpoints.down('sm')]: {
+    minWidth: 200,
+    maxWidth: 200,
+  },
 }))
 
 export const Chip = styled(BaseChip)(
@@ -42,4 +51,13 @@ export const FormControl = styled(BaseFormControl)(() => ({
 export const SelectFile = styled('input')(() => ({
   textAlign: 'center',
   width: 200,
+}))
+
+export const Wrapper = styled('div')(({ theme }) => ({
+  width: 340,
+  [theme.breakpoints.down('sm')]: {
+    width: 200,
+    minWidth: 200,
+    maxWidth: 200,
+  },
 }))

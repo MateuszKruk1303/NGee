@@ -11,6 +11,7 @@ export interface IUserModel extends Document {
   activated: boolean
   emergencyId: string
   isAdmin: boolean
+  notifications: string[]
   comparePasswords: (incomingPassword: string, userPassword: string) => boolean
 }
 
@@ -45,17 +46,23 @@ const userSchema: Schema = new Schema({
     },
   },
   accountActivationHash: {
-    type: Number,
+    type: String,
   },
   activated: {
     type: Boolean,
   },
   emergencyId: {
-    type: Number,
+    type: String,
   },
   isAdmin: {
     type: Boolean,
   },
+  notifications: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Notification',
+    },
+  ],
 })
 
 userSchema.pre('save', async function (this: IUserModel, next: any) {

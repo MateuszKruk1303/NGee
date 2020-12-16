@@ -9,4 +9,7 @@ export const Card = styled(BaseCard)(({ theme }) => ({
   padding: 10,
   boxShadow: 'none',
   width: '100%',
+  [theme.breakpoints.down('sm')]: {
+    wordBreak: 'break-word',
+  },
 }))

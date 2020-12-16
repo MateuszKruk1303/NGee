@@ -49,6 +49,7 @@ export default ({ formType, userId, onClose }: IGenericProfileActionForm) => {
                   helperText={touched.varField && errors.varField}
                   value={values.varField}
                   onChange={handleChange}
+                  type={formType === 'passwordChange' ? 'password' : ''}
                   name="varField"
                   label={varfieldLabel(formType)}
                 ></TextField>

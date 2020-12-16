@@ -17,6 +17,9 @@ const commentSchema: Schema = new Schema({
   solution: {
     type: Boolean,
   },
+  createDate: {
+    type: Date,
+  },
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',

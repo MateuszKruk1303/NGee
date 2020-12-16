@@ -1,31 +1,39 @@
 import { CommentModel, ICommentModel } from '../models/comment.model'
 import { PostModel, IPostModel } from '../models/post.model'
 import { UserModel, IUserModel } from '../models/user.model'
+import {
+  NotificationModel,
+  INotificationModel,
+} from '../models/notification.model'
 
 export abstract class CommentController {
-  //   public static async getAllItems(req: any, res: any, next: any) {
-  //     try {
-  //       const data = await ItemModel.find()
-  //       res.status(200).json({ data })
-  //     } catch (err) {
-  //       console.log(err)
-  //       res.status(500).json({ status: 'Error' })
-  //     }
-  //   }
   public static async addCommentToPost(req: any, res: any, next: any) {
     try {
       const { content, userId, postId } = req.body
-      console.log(req.body)
+      const post = (await PostModel.findById(postId)) as IPostModel
+      const user = (await UserModel.findById(userId)) as IUserModel
+      if (!content || !postId || !userId) throw 'error'
+      if (!post || !user) throw 'error'
       const newComment = await CommentModel.create({
         content: content,
         createdBy: userId,
         votes: [],
         solution: false,
+        createDate: new Date(Date.now()),
       })
       await PostModel.updateOne(
         { _id: postId },
         { $push: { comments: newComment._id } }
       )
+      if (post.createdBy != userId)
+        await NotificationModel.create({
+          content: `${user.name} added comment to your post`,
+          date: new Date(Date.now()),
+          postId: postId,
+          watched: false,
+          userId: post.createdBy,
+        })
+
       res.status(201).json({
         data: await newComment
           .populate({
@@ -44,12 +52,13 @@ export abstract class CommentController {
       })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async addVote(req: any, res: any, next: any) {
     try {
       const { userId, commentId } = req.body
+      if (!commentId || !userId) throw 'error'
       const comment = ((await CommentModel.findById(
         commentId
       )) as unknown) as ICommentModel
@@ -77,12 +86,13 @@ export abstract class CommentController {
       }
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
   public static async tagAsSolution(req: any, res: any, next: any) {
     try {
       const { commentId, postId, userId } = req.body
+      if (!commentId || !postId || !userId) throw 'error'
       const comment = ((await CommentModel.findById(
         commentId
       )) as unknown) as ICommentModel
@@ -107,28 +117,52 @@ export abstract class CommentController {
       })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ status: err })
+      res.status(500).json({ error: err })
     }
   }
-  //   public static async deleteItemByName(req: any, res: any, next: any) {
-  //     try {
-  //       const deleteOne = await ItemModel.deleteOne({ name: req.params.name })
-  //       res.status(200).json({ deleteOne })
-  //     } catch (err) {
-  //       console.log(err)
-  //       res.status(500).json({ status: 'Error' })
-  //     }
-  //   }
-  //   public static async updateItemById(req: any, res: any, next: any) {
-  //     try {
-  //       const updateOne = await ItemModel.updateOne(
-  //         { name: req.params.name },
-  //         req.body
-  //       )
-  //       res.status(201).json({ updateOne })
-  //     } catch (err) {
-  //       console.log(err)
-  //       res.status(500).json({ status: 'Error' })
-  //     }
-  //   }
+  public static async editComment(req: any, res: any, next: any) {
+    try {
+      const { commentId, postId, userId, content } = req.body
+      if (!commentId || !postId || !userId || !content) throw 'error'
+      const comment = ((await CommentModel.findById(
+        commentId
+      )) as unknown) as ICommentModel
+      const post = (await PostModel.findById(postId)) as IPostModel
+      const user = (await UserModel.findById(userId)) as IUserModel
+
+      if (!comment || !post) throw 'There is no post or comment with this id'
+      if (comment.createdBy == userId || user.isAdmin) {
+        await CommentModel.updateOne(
+          { _id: commentId },
+          { $set: { content: content } }
+        )
+        res.status(201).json({
+          data: { commentId, content },
+        })
+      } else throw 'You cant edit this post'
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
+
+  public static async deleteComment(req: any, res: any, next: any) {
+    try {
+      const { userId, commentId, postId } = req.body
+      if (!commentId || !postId || !userId) throw 'error'
+      const comment = ((await CommentModel.findById(
+        commentId
+      )) as unknown) as ICommentModel
+      const post = (await PostModel.findById(postId)) as IPostModel
+      const user = (await UserModel.findById(userId)) as IUserModel
+      if (!comment || !post) throw 'There is no post or comment with this id'
+      if (comment.createdBy == userId || user.isAdmin) {
+        await CommentModel.deleteOne({ _id: commentId })
+        res.status(201).json({ data: { commentId } })
+      } else throw 'You cant delete this post'
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
 }

@@ -12,6 +12,8 @@ const apiPaths = {
   deleteAccount: '/user/deleteaccount',
   orderResetPassword: '/user/orderresetpassword',
   resetPassword: '/user/resetpassword',
+  getNotifications: '/user/getnotifications',
+  updateNotification: '/user/notificationupdate',
 }
 
 export interface ILogin {
@@ -60,11 +62,22 @@ export interface IResetPassword {
   newPasswordConfirm: string
 }
 
+export interface IGetNotifications {
+  userId: string
+}
+export interface INotificationUpdate {
+  userId: string
+  notificationId: string
+}
+
 const headers = {
   'Content-Type': 'multipart/form-data',
 }
 
-export const loginApi = (axiosInstance: AxiosInstance) => ({
+export const loginApi = (
+  axiosInstance: AxiosInstance,
+  axiosInstanceAuth: AxiosInstance
+) => ({
   async login(data: ILogin) {
     return axiosInstance.post(apiPaths.login, data)
   },
@@ -72,27 +85,33 @@ export const loginApi = (axiosInstance: AxiosInstance) => ({
     return axiosInstance.post(apiPaths.signup, data)
   },
   async uploadPhoto(data: FormData) {
-    return axiosInstance.post(apiPaths.uploadPhoto, data, { headers })
+    return axiosInstanceAuth.post(apiPaths.uploadPhoto, data, { headers })
   },
   async activateAccount(data: IActivateAccount) {
     return axiosInstance.post(apiPaths.activateAccount, data)
   },
   async changeEmail(data: IChangeEmail) {
-    return axiosInstance.post(apiPaths.changeEmail, data)
+    return axiosInstanceAuth.post(apiPaths.changeEmail, data)
   },
   async changePassword(data: IChangePassword) {
-    return axiosInstance.post(apiPaths.changePassword, data)
+    return axiosInstanceAuth.post(apiPaths.changePassword, data)
   },
   async changeNickname(data: IChangeNickname) {
-    return axiosInstance.post(apiPaths.changeNickname, data)
+    return axiosInstanceAuth.post(apiPaths.changeNickname, data)
   },
   async deleteAccount(data: IDeleteAccount) {
-    return axiosInstance.post(apiPaths.deleteAccount, data)
+    return axiosInstanceAuth.post(apiPaths.deleteAccount, data)
   },
   async orderResetPassword(data: IOrderResetPassword) {
     return axiosInstance.post(apiPaths.orderResetPassword, data)
   },
   async resetPassword(data: IResetPassword) {
     return axiosInstance.post(apiPaths.resetPassword, data)
+  },
+  async getNotifications(data: IGetNotifications) {
+    return axiosInstanceAuth.post(apiPaths.getNotifications, data)
+  },
+  async notificationUpdate(data: INotificationUpdate) {
+    return axiosInstanceAuth.post(apiPaths.updateNotification, data)
   },
 })

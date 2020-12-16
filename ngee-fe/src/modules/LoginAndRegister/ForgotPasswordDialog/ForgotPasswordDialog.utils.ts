@@ -9,6 +9,5 @@ export const validationSchema = () =>
   })
 
 export const onSubmit = (email: string, dispatch: Dispatch) => {
-  console.log(email)
   dispatch(orderResetPassword({ dto: { email } }) as any)
 }

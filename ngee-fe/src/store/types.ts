@@ -4,6 +4,8 @@ export interface IInitialLoginState {
   profilePicture: string | null
   isLoading: boolean
   error: string | null
+  message: string | null
+  notifications: Notification[]
 }
 
 export interface IInitialPostState {
@@ -21,12 +23,23 @@ export interface User {
   photo: string
 }
 
+export interface Notification {
+  notificationId: string
+  _id: string
+  content: string
+  date: Date
+  postId: string
+  watched: boolean
+  userId: string
+}
+
 export interface Comment {
   votes: []
   commentId: string
   _id: string
   content: string
   createdBy: User
+  createDate: Date
   solution: boolean
 }
 
