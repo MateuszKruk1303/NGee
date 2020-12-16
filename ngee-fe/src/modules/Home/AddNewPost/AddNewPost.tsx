@@ -222,19 +222,22 @@ export default ({
                   Add tag
                 </Button>
               </Grid>
-              <Grid item>
-                <Typography variant="subtitle1">Add photos</Typography>
-              </Grid>
+
               <Grid item>
                 {!postId && (
-                  <SelectFile
-                    type="file"
-                    onChange={e => {
-                      setSelectedFile(e.target.files)
-                    }}
-                    name="profileimage"
-                    multiple
-                  ></SelectFile>
+                  <>
+                    <Grid item>
+                      <Typography variant="subtitle1">Add photos</Typography>
+                    </Grid>
+                    <SelectFile
+                      type="file"
+                      onChange={e => {
+                        setSelectedFile(e.target.files)
+                      }}
+                      name="profileimage"
+                      multiple
+                    ></SelectFile>
+                  </>
                 )}
               </Grid>
               <Grid item>

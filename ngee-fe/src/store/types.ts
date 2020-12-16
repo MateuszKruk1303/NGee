@@ -3,6 +3,8 @@ export interface IInitialLoginState {
   userId: string | null
   profilePicture: string | null
   isLoading: boolean
+  isAdmin: string | null
+  isBanned: string | null
   error: string | null
   message: string | null
   notifications: Notification[]
@@ -21,6 +23,7 @@ export interface User {
   _id: string
   name: string
   photo: string
+  isAdmin: boolean
 }
 
 export interface Notification {

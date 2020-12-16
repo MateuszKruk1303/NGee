@@ -14,6 +14,8 @@ const apiPaths = {
   resetPassword: '/user/resetpassword',
   getNotifications: '/user/getnotifications',
   updateNotification: '/user/notificationupdate',
+  banUser: '/user/banuser',
+  checkIsBanned: '/user/checkisbanned',
 }
 
 export interface ILogin {
@@ -65,9 +67,19 @@ export interface IResetPassword {
 export interface IGetNotifications {
   userId: string
 }
+
+export interface ICheckIsBanned {
+  userId: string
+}
+
 export interface INotificationUpdate {
   userId: string
   notificationId: string
+}
+
+export interface IBanUser {
+  name: string
+  adminPassword: string
 }
 
 const headers = {
@@ -113,5 +125,11 @@ export const loginApi = (
   },
   async notificationUpdate(data: INotificationUpdate) {
     return axiosInstanceAuth.post(apiPaths.updateNotification, data)
+  },
+  async banUser(data: IBanUser) {
+    return axiosInstanceAuth.post(apiPaths.banUser, data)
+  },
+  async checkIsBanned(data: ICheckIsBanned) {
+    return axiosInstanceAuth.post(apiPaths.checkIsBanned, data)
   },
 })

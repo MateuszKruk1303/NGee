@@ -11,6 +11,8 @@ import {
   IOrderResetPassword,
   IGetNotifications,
   INotificationUpdate,
+  IBanUser,
+  ICheckIsBanned,
 } from '../../utils/login'
 import { Notification } from '../types'
 import api from '../../utils/api'
@@ -19,6 +21,8 @@ interface ILoginUserInfoResponse {
   name: string
   userId: string
   photo: string
+  isAdmin: boolean
+  isBanned: boolean
 }
 
 interface ILoginResponse {
@@ -180,6 +184,30 @@ export const resetPassword = createAsyncThunk<
 >('resetPassword', async ({ dto }, thunkAPI) => {
   try {
     const response = await api.resetPassword(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+export const banUser = createAsyncThunk<
+  { response: { status: string } },
+  { dto: IBanUser },
+  { rejectValue: any }
+>('banUser', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.banUser(dto)
+    return { response: response.data }
+  } catch (err) {
+    return thunkAPI.rejectWithValue(err)
+  }
+})
+export const checkIsBanned = createAsyncThunk<
+  { response: { isBanned: boolean } },
+  { dto: ICheckIsBanned },
+  { rejectValue: any }
+>('checkIsBanned', async ({ dto }, thunkAPI) => {
+  try {
+    const response = await api.checkIsBanned(dto)
     return { response: response.data }
   } catch (err) {
     return thunkAPI.rejectWithValue(err)

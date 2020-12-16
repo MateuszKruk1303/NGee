@@ -202,24 +202,22 @@ export abstract class PostController {
       if (!keyWord || !actualPage) throw 'error'
       const tagSearchedPosts = (await PostModel.find({
         tags: { $in: keyWord },
-      })) as IPostModel[] // *CLICK* NICE!
+      })) as IPostModel[]
       const titleSearchedPosts = (await PostModel.find({
-        title: { $regex: keyWord },
-      })) as IPostModel[] // *CLICK* NICE!
+        title: { $regex: keyWord, $options: 'i' },
+      })) as IPostModel[]
+      console.log(titleSearchedPosts)
       const contentSearchedPosts = (await PostModel.find({
-        content: { $regex: keyWord },
-      })) as IPostModel[] // *CLICK* NICE!
+        content: { $regex: keyWord, $options: 'i' },
+      })) as IPostModel[]
       if (!titleSearchedPosts && !tagSearchedPosts && contentSearchedPosts)
         throw "Couldn't find any post"
       const allPostIds = [
         ...tagSearchedPosts,
-        ...tagSearchedPosts,
+        ...titleSearchedPosts,
         ...contentSearchedPosts,
-      ].map((post) => post._id)
-
-      const uniquePostsIds = allPostIds.filter(
-        (val, i, self) => self.indexOf(val) === i
-      )
+      ].map((post) => post._id.toString())
+      const uniquePostsIds = [...new Set(allPostIds)]
       const uniquePostsIdsToSend = uniquePostsIds.filter(
         (postId, index) =>
           index + 1 < actualPage * 10 + 1 && index + 1 > (actualPage - 1) * 10

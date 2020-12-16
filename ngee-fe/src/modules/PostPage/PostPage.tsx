@@ -55,10 +55,10 @@ export default () => {
     dispatch(getPostById({ dto: { postId } }))
   }, [getPostById])
   const post = useSelector((state: RootState) => state.post.post)
-  const userId = useSelector((state: RootState) => state.login.userId)
+  const { userId, isAdmin } = useSelector((state: RootState) => state.login)
   const isLoading = useSelector((state: RootState) => state.post.isLoading)
 
-  const isCreator = post?.createdBy.userId == userId
+  const isCreator = isAdmin || post?.createdBy.userId == userId
 
   const postPicturePath = (photo: string) =>
     `${process.env.REACT_APP_BACKEND_URL}/postPictures/${photo}`

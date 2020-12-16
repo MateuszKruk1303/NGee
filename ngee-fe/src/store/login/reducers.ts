@@ -13,6 +13,8 @@ import {
   orderResetPassword,
   getNotifications,
   notificationUpdate,
+  banUser,
+  checkIsBanned,
 } from './thunks'
 import { profilePicturePath, clearForLogout } from './utils'
 
@@ -20,6 +22,8 @@ const initialLoginState: IInitialLoginState = {
   name: localStorage.getItem('name'),
   userId: localStorage.getItem('userId'),
   profilePicture: localStorage.getItem('photo'),
+  isAdmin: localStorage.getItem('isAdmin'),
+  isBanned: localStorage.getItem('isBanned'),
   isLoading: false,
   error: null,
   message: null,
@@ -38,6 +42,14 @@ export default createReducer(initialLoginState, builder => {
       localStorage.setItem('token', payload.response.token)
       localStorage.setItem('userId', payload.response.data.userId)
       localStorage.setItem('name', payload.response.data.name)
+      localStorage.setItem(
+        'isAdmin',
+        payload.response.data.isAdmin ? 'true' : ''
+      )
+      localStorage.setItem(
+        'isBanned',
+        payload.response.data.isBanned ? 'true' : ''
+      )
       if (payload.response.data.photo) {
         localStorage.setItem(
           'photo',
@@ -47,6 +59,8 @@ export default createReducer(initialLoginState, builder => {
       }
       state.name = payload.response.data.name
       state.userId = payload.response.data.userId
+      state.isAdmin = payload.response.data.isAdmin ? 'true' : ''
+      state.isBanned = payload.response.data.isBanned ? 'true' : ''
       state.isLoading = false
       state.error = null
     })
@@ -71,6 +85,22 @@ export default createReducer(initialLoginState, builder => {
     .addCase(logout, state => {
       window.location.replace('/')
       clearForLogout(state)
+    })
+    .addCase(checkIsBanned.pending, state => {
+      state.isLoading = true
+      state.error = null
+    })
+    .addCase(checkIsBanned.fulfilled, (state, { payload }) => {
+      state.isLoading = false
+      state.error = null
+      if (payload.response.isBanned) {
+        window.location.replace('/')
+        clearForLogout(state)
+      }
+    })
+    .addCase(checkIsBanned.rejected, (state, { payload }) => {
+      state.isLoading = false
+      if (payload) state.error = payload.response.data.error
     })
     .addCase(uploadPhoto.pending, state => {
       state.profilePicture = null
@@ -220,6 +250,21 @@ export default createReducer(initialLoginState, builder => {
     })
     .addCase(notificationUpdate.rejected, (state, { payload }) => {
       state.isLoading = false
+      if (payload) state.error = payload.response.data.error
+    })
+    .addCase(banUser.pending, state => {
+      state.isLoading = true
+      state.error = null
+    })
+    .addCase(banUser.fulfilled, (state, { payload }) => {
+      state.isLoading = false
+      state.error = null
+      state.message = 'user has been banned'
+      state.message = null
+    })
+    .addCase(banUser.rejected, (state, { payload }) => {
+      state.isLoading = false
+      console.log(payload.response)
       if (payload) state.error = payload.response.data.error
     })
 })

@@ -2,6 +2,7 @@ import { TextField, Typography, Grid } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts, searchPosts } from '../../store/posts/thunks'
+import { checkIsBanned } from '../../store/login/thunks'
 import { RootState } from '../../store/types'
 import { Wrapper, Button, SearchContainer, SearchButton } from './Home.style'
 import PostContainer from './PostContainer'
@@ -15,9 +16,6 @@ import SearchIcon from '@material-ui/icons/Search'
 
 export default () => {
   const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(getAllPosts({ dto: { actualPage: 1 } }))
-  }, [getAllPosts])
 
   const posts = useSelector((state: RootState) => state.post.posts)
   const isLoading = useSelector((state: RootState) => state.post.isLoading)
@@ -34,6 +32,11 @@ export default () => {
   const [keyWord, setKeyWord] = useState('')
   const [isSearching, setSearching] = useState(false)
   const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    dispatch(getAllPosts({ dto: { actualPage: 1 } }))
+    if (userId) dispatch(checkIsBanned({ dto: { userId } }))
+  }, [getAllPosts, checkIsBanned])
 
   return (
     <Wrapper>
@@ -80,9 +83,15 @@ export default () => {
           <Typography>Login to as the question!</Typography>
         </Button>
       )}
-      {posts && <PostContainer posts={posts} />}
+      {posts && (
+        <>
+          {' '}
+          <PostContainer posts={posts} />{' '}
+        </>
+      )}
       {isSearching ? (
         <Pagination
+          style={{ marginTop: 5 }}
           count={Math.ceil(numberOfPosts / 10)}
           page={page}
           onChange={(e, page) => {
@@ -94,6 +103,7 @@ export default () => {
         ></Pagination>
       ) : (
         <Pagination
+          style={{ marginTop: 5 }}
           count={Math.ceil(numberOfPosts / 10)}
           page={page}
           onChange={(e, page) => {

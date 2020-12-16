@@ -11,6 +11,7 @@ export interface IUserModel extends Document {
   activated: boolean
   emergencyId: string
   isAdmin: boolean
+  isBanned: boolean
   notifications: string[]
   comparePasswords: (incomingPassword: string, userPassword: string) => boolean
 }
@@ -19,11 +20,12 @@ const userSchema: Schema = new Schema({
   name: {
     type: String,
     required: [true, 'name is required'],
+    unique: [true, 'this nickname is taken'],
   },
   email: {
     type: String,
     required: [true, 'name is required'],
-    unique: [true, 'this email is not available'],
+    unique: [true, 'this email is taken'],
     lowercase: true,
   },
   photo: {
@@ -55,6 +57,9 @@ const userSchema: Schema = new Schema({
     type: String,
   },
   isAdmin: {
+    type: Boolean,
+  },
+  isBanned: {
     type: Boolean,
   },
   notifications: [

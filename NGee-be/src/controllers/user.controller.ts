@@ -25,6 +25,14 @@ export class UserController {
     try {
       const { name, email, photo, password, passwordConfirm } = req.body
       if (!name || !email || !password || !passwordConfirm) throw 'error'
+      const isEmailTaken = (await UserModel.findOne({
+        email: email,
+      })) as IUserModel
+      if (isEmailTaken) throw 'This email is taken'
+      const isNameTaken = (await UserModel.findOne({
+        name: name,
+      })) as IUserModel
+      if (isNameTaken) throw 'This nickname is taken'
       const activationHash = v4()
       await UserModel.create({
         name: name,
@@ -35,6 +43,7 @@ export class UserController {
         accountActivationHash: activationHash,
         activated: false,
         isAdmin: false,
+        isBanned: false,
       })
       await mailSender(
         email,
@@ -51,11 +60,11 @@ export class UserController {
     try {
       const { email, password } = req.body
       if (!email || !password) throw 'password and email are required'
-
       const user: IUserModel | null = (await UserModel.findOne({
         email: email,
       })) as IUserModel
       if (!user || !user.activated) throw 'User does not exist'
+      if (user.isBanned) throw 'User is banned'
       //Never trust error with await like below.
       const correct: boolean = await user.comparePasswords(
         password,
@@ -69,6 +78,7 @@ export class UserController {
             name: user.name,
             userId: user.id,
             photo: normalizeImagePath(user.photo),
+            isAdmin: user.isAdmin,
           },
         })
       } else throw 'Wrong password or email'
@@ -84,7 +94,7 @@ export class UserController {
       const user = (await UserModel.findOne({
         accountActivationHash: activationHash,
       })) as IUserModel
-      if (!user) throw new Error('Fail')
+      if (!user) throw 'Fail - user does not exist'
       await UserModel.updateOne(
         { accountActivationHash: activationHash },
         { $set: { activated: true } }
@@ -205,6 +215,10 @@ export class UserController {
         user.password
       )
       if (!correct) throw 'Wrong Password'
+      const isNameTaken = (await UserModel.findOne({
+        name: newNickname,
+      })) as IUserModel
+      if (isNameTaken) throw 'This nickname is taken'
       await UserModel.updateOne(
         { _id: userId },
         { $set: { name: newNickname } }
@@ -333,7 +347,6 @@ export class UserController {
         {},
         { sort: { date: -1 } }
       )) as unknown) as INotificationModel[]
-      console.log(notifications)
       res.status(201).json({
         data: {
           notifications: notifications.filter(
@@ -341,6 +354,53 @@ export class UserController {
           ),
         },
       })
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
+
+  public static async makeUserAdmin(req: Request, res: Response) {
+    try {
+      const { userId, adminPassword } = req.body
+      if (!adminPassword || !userId) throw 'error'
+      const user = (await UserModel.findById(userId)) as IUserModel
+      if (!user) throw 'There is no user with this id'
+      const correct: boolean = adminPassword == process.env['ADMIN_PASSWORD']
+      if (!correct) throw 'Wrong Password'
+      await UserModel.updateOne({ _id: userId }, { $set: { isAdmin: true } })
+      res.status(201).json({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
+
+  public static async banUser(req: Request, res: Response) {
+    try {
+      const { name, adminPassword } = req.body
+      if (!adminPassword || !name) throw 'error'
+      const user = ((await UserModel.findOne({
+        name: name,
+      })) as unknown) as IUserModel
+      if (!user) throw 'There is no user with this name'
+      const correct: boolean = adminPassword == process.env['ADMIN_PASSWORD']
+      if (!correct) throw 'Wrong Password'
+      await UserModel.updateOne({ name: name }, { $set: { isBanned: true } })
+      res.status(201).json({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      res.status(500).json({ error: err })
+    }
+  }
+
+  public static async checkIsBanned(req: Request, res: Response) {
+    try {
+      const { userId } = req.body
+      if (!userId) throw 'error'
+      const user = (await UserModel.findById(userId)) as IUserModel
+      if (!user) throw 'There is no user with this name'
+      res.status(201).json({ isBanned: user.isBanned })
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: err })

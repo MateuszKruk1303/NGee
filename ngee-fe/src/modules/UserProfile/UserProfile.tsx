@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
-import { Wrapper, Avatar, ChooseFile, Button, Grid } from './UserProfile.style'
+import {
+  Wrapper,
+  Avatar,
+  ChooseFile,
+  Button,
+  Grid,
+  TextField,
+  AdminPanel,
+} from './UserProfile.style'
 import { useDispatch, useSelector } from 'react-redux'
-import { uploadPhoto, changeEmail } from '../../store/login/thunks'
+import { uploadPhoto, banUser } from '../../store/login/thunks'
 import { getUserPosts } from '../../store/posts/thunks'
 import { RootState } from '../../store/types'
 import { formatDate } from './UserProfile.utils'
@@ -21,16 +29,21 @@ export default () => {
   const [passwordChangeDialog, setPasswordChangeDialog] = useState(false)
   const [nicknameChangeDialog, setNicknameChangeDialog] = useState(false)
   const [deleteAccountDialog, setDeleteAccountDialog] = useState(false)
+  const [userToBan, setUserToBan] = useState('')
+  const [adminPassword, setAdminPassword] = useState('')
   const [page, setPage] = useState(1)
 
   const dispatch = useDispatch()
-  const isLoading = useSelector((state: RootState) => state.login.isLoading)
-  const message = useSelector((state: RootState) => state.login.message)
-  const error = useSelector((state: RootState) => state.login.error)
 
-  const { userId, name, profilePicture } = useSelector(
-    (state: RootState) => state.login
-  )
+  const {
+    userId,
+    name,
+    profilePicture,
+    message,
+    error,
+    isLoading,
+    isAdmin,
+  } = useSelector((state: RootState) => state.login)
 
   const { posts, numberOfPosts } = useSelector((state: RootState) => state.post)
 
@@ -50,6 +63,13 @@ export default () => {
       dispatch(uploadPhoto({ dto: fd }))
     }
   }
+
+  const handleBanUser = () => {
+    dispatch(
+      banUser({ dto: { name: userToBan, adminPassword: adminPassword } })
+    )
+  }
+
   return (
     <Wrapper>
       {message && <Snackbar message={message} isError={false} />}
@@ -145,6 +165,43 @@ export default () => {
               </Typography>
             </Button>
           </ProfileActionsCard>
+        </Grid>
+        <Grid item>
+          {isAdmin && (
+            <AdminPanel>
+              <Grid container direction="column" alignItems="center">
+                <Grid item>
+                  <Typography variant="h6">Ban user</Typography>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    placeholder="User name"
+                    value={userToBan}
+                    variant="outlined"
+                    onChange={e => {
+                      setUserToBan(e.target.value)
+                    }}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    placeholder="Admin password"
+                    type="password"
+                    variant="outlined"
+                    value={adminPassword}
+                    onChange={e => {
+                      setAdminPassword(e.target.value)
+                    }}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" onClick={handleBanUser}>
+                    Ban user
+                  </Button>
+                </Grid>
+              </Grid>
+            </AdminPanel>
+          )}
         </Grid>
       </Grid>
       <PostWrapper>

@@ -34,5 +34,8 @@ router
 router
   .route('/notificationupdate')
   .post(UserController.Authorize, UserController.notificationUpdate)
+router.route('/getadminpermission').post(UserController.makeUserAdmin)
+router.route('/banuser').post(UserController.banUser)
+router.route('/checkisbanned').post(UserController.checkIsBanned)
 
 export default router

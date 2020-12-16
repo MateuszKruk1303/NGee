@@ -59,10 +59,10 @@ export default ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [isCommentEdited, setCommentEdit] = useState(false)
   const [comment, setComment] = useState(content)
-  const userId = useSelector((state: RootState) => state.login.userId)
+  const { userId, isAdmin } = useSelector((state: RootState) => state.login)
   const open = Boolean(anchorEl)
 
-  const isCreator = createdBy.userId == userId
+  const isCreator = isAdmin || createdBy.userId == userId
 
   const handleAddLike = () => {
     if (userId) dispatch(addVoteToComment({ dto: { commentId, userId } }))
