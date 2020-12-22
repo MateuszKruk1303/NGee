@@ -15,10 +15,10 @@ export const Card = styled(BaseCard)(({ theme }) => ({
   boxShadow: 'none',
   border: '.4px solid rgba(0,0,0,0.2)',
   padding: 20,
-  minWidth: 700,
+  minWidth: '95vw',
   [theme.breakpoints.down('sm')]: {
     minWidth: 'unset',
-    width: 'auto',
+    width: '95vw',
   },
 }))
 

@@ -51,7 +51,7 @@ export default ({
   const [tags, setTags] = useState<string[]>(existingTags ? existingTags : [])
   const [tag, setTag] = useState<string>('')
   const [category, setCategory] = useState<string>(
-    existingCategory ? existingCategory : 'Automation'
+    existingCategory ? existingCategory : 'Automatyka'
   )
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const isMenuOpen = Boolean(anchorEl)
@@ -137,7 +137,7 @@ export default ({
               spacing={2}
             >
               <Grid item>
-                <Typography variant="subtitle1">Title</Typography>
+                <Typography variant="subtitle1">Nazwij swój problem</Typography>
                 <TextField
                   variant="outlined"
                   error={touched.title && Boolean(errors.title)}
@@ -145,13 +145,11 @@ export default ({
                   value={values.title}
                   onChange={handleChange}
                   name="title"
-                  placeholder="title"
+                  placeholder="tytuł"
                 ></TextField>
               </Grid>
               <Grid item>
-                <Typography variant="subtitle1">
-                  Describe your problem
-                </Typography>
+                <Typography variant="subtitle1">Opisz swój problem</Typography>
                 <TextField
                   variant="outlined"
                   error={touched.content && Boolean(errors.content)}
@@ -160,20 +158,20 @@ export default ({
                   onChange={handleChange}
                   name="content"
                   multiline
-                  placeholder="content"
+                  placeholder="opis"
                   rows={4}
                 ></TextField>
               </Grid>
               <Grid item>
-                <Typography variant="subtitle1">Select category</Typography>
+                <Typography variant="subtitle1">Wybierz kategorię</Typography>
                 <Select
                   value={category}
                   onChange={e => setCategory(e.target.value as string)}
                 >
-                  <MenuItem value="Automation">Automation</MenuItem>
-                  <MenuItem value="Robotics">Robotics</MenuItem>
-                  <MenuItem value="College">College</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
+                  <MenuItem value="Automatyka">Automatyka</MenuItem>
+                  <MenuItem value="Robotyka">Robotyka</MenuItem>
+                  <MenuItem value="Studia">Studia</MenuItem>
+                  <MenuItem value="Inne">Inne</MenuItem>
                 </Select>
               </Grid>
               <Grid item>
@@ -188,7 +186,7 @@ export default ({
                     />
                   ))
                 ) : (
-                  <Typography variant="body1">No tags selected</Typography>
+                  <Typography variant="body1">Nie wybrano tagów</Typography>
                 )}
               </Grid>
               <Grid item>
@@ -219,7 +217,7 @@ export default ({
                   variant="contained"
                   onClick={e => setAnchorEl(e.currentTarget)}
                 >
-                  Add tag
+                  Dodaj tag
                 </Button>
               </Grid>
 
@@ -227,7 +225,7 @@ export default ({
                 {!postId && (
                   <>
                     <Grid item>
-                      <Typography variant="subtitle1">Add photos</Typography>
+                      <Typography variant="subtitle1">Dodaj zdjęcia</Typography>
                     </Grid>
                     <SelectFile
                       type="file"
@@ -243,11 +241,11 @@ export default ({
               <Grid item>
                 <Grid container justify="center" spacing={3}>
                   <Grid item>
-                    <Button onClick={() => onClose()}>Cancel</Button>
+                    <Button onClick={() => onClose()}>Anuluj</Button>
                   </Grid>
                   <Grid item>
                     <Button type="submit" variant="contained">
-                      Submit
+                      {postId ? 'Zastosuj' : 'Dodaj post'}
                     </Button>
                   </Grid>
                 </Grid>

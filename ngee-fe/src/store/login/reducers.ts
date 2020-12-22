@@ -16,7 +16,7 @@ import {
   banUser,
   checkIsBanned,
 } from './thunks'
-import { profilePicturePath, clearForLogout } from './utils'
+import { profilePicturePath, clearForLogout, normalizeImagePath } from './utils'
 
 const initialLoginState: IInitialLoginState = {
   name: localStorage.getItem('name'),
@@ -42,6 +42,8 @@ export default createReducer(initialLoginState, builder => {
       localStorage.setItem('token', payload.response.token)
       localStorage.setItem('userId', payload.response.data.userId)
       localStorage.setItem('name', payload.response.data.name)
+      console.log(payload.response.data.photo)
+      console.log(profilePicturePath(payload.response.data.photo))
       localStorage.setItem(
         'isAdmin',
         payload.response.data.isAdmin ? 'true' : ''
@@ -53,9 +55,13 @@ export default createReducer(initialLoginState, builder => {
       if (payload.response.data.photo) {
         localStorage.setItem(
           'photo',
-          profilePicturePath(payload.response.data.photo)
+          profilePicturePath(
+            normalizeImagePath(payload.response.data.photo) as string
+          )
         )
-        state.profilePicture = profilePicturePath(payload.response.data.photo)
+        state.profilePicture = profilePicturePath(
+          normalizeImagePath(payload.response.data.photo) as string
+        )
       }
       state.name = payload.response.data.name
       state.userId = payload.response.data.userId

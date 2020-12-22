@@ -3,15 +3,17 @@ import { IFormValues } from './LoginAndRegister'
 
 export const validationSchema = () =>
   object().shape<IFormValues>({
-    name: string().min(2, 'Your name is too short').required('Fill this field'),
-    email: string().email('Invalid Email').required('Fill this field'),
+    name: string()
+      .min(2, 'Twoja nazwa jest za krótka')
+      .required('Uzupełnij to pole'),
+    email: string().email('Niepoprawny E-mail').required('Uzupełnij to pole'),
     password: string()
-      .min(8, 'Your password is too short')
-      .matches(/[a-z]/, 'At least one lowercase character')
-      .matches(/[A-Z]/, 'At least one uppercase character')
-      .matches(/[1-9]/, 'At least one number')
-      .required('Fill this field'),
+      .min(8, 'Hasło jest za krótkie')
+      .matches(/[a-z]/, 'Hasło powinno zawierać małą literę')
+      .matches(/[A-Z]/, 'Hasło powinno zawierać dużą literę')
+      .matches(/[1-9]/, 'Hasło powinno zawierać cyfrę')
+      .required('Uzupełnij to pole'),
     passwordConfirm: string()
-      .oneOf([ref('password')], 'Passwords must match')
-      .required(),
+      .oneOf([ref('password')], 'Hasła muszą być takie same')
+      .required('Uzupełnij to pole'),
   })

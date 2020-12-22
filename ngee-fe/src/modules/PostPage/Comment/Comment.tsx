@@ -103,7 +103,7 @@ export default ({
             <CancelIcon fontSize="small" />
           </CancelButton>
           <TextField
-            placeholder="Add Comment..."
+            placeholder="Komentarz..."
             multiline
             rows={2}
             rowsMax={7}
@@ -152,7 +152,9 @@ export default ({
                         >
                           <CheckCircleOutlineIcon />
                           <Typography>
-                            {solution ? 'solution' : 'Tag as solution'}
+                            {solution
+                              ? 'Rozwiązanie'
+                              : 'Oznacz jako rozwiązanie'}
                           </Typography>
                         </IconButton>
                       )}
@@ -165,7 +167,7 @@ export default ({
                           disabled={closed}
                         >
                           <CheckCircleOutlineIcon />
-                          <Typography>Tag as solution</Typography>
+                          <Typography>Oznacz jako rozwiązanie</Typography>
                         </IconButton>
                       )}
                     </Grid>
@@ -193,7 +195,7 @@ export default ({
                 <Grid container wrap="nowrap">
                   <Grid item>
                     <IconButton onClick={handleAddLike} style={{ padding: 0 }}>
-                      <Typography style={{ paddingRight: 3 }}>Like</Typography>
+                      <Typography style={{ paddingRight: 3 }}>Polub</Typography>
                       <FavoriteIcon
                         style={{ color: isLiked() ? 'red' : 'initial' }}
                       />
@@ -223,7 +225,7 @@ export default ({
                           style={{ padding: 0 }}
                         >
                           <Typography style={{ paddingRight: 3 }}>
-                            Like
+                            Polub
                           </Typography>
                           <FavoriteIcon
                             style={{ color: isLiked() ? 'red' : 'initial' }}
@@ -250,7 +252,7 @@ export default ({
                 setAnchorEl(null)
               }}
             >
-              Edit comment
+              Edytuj komentarz
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -258,7 +260,7 @@ export default ({
                 setAnchorEl(null)
               }}
             >
-              Delete comment
+              Usuń komentarz
             </MenuItem>
           </Menu>
         </Card>

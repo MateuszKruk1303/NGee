@@ -28,7 +28,7 @@ export default () => {
   return (
     <Wrapper>
       {error && <Snackbar isError={true} message={error} />}
-      <GenericCard title="Reset your password" actionsAvailable={false}>
+      <GenericCard title="Zresetuj swoje hasło" actionsAvailable={false}>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -59,7 +59,7 @@ export default () => {
                     onChange={handleChange}
                     type="password"
                     name="newPassword"
-                    label="New password"
+                    label="Nowe hasło"
                   ></TextField>
                 </Grid>
                 <Grid item>
@@ -76,7 +76,7 @@ export default () => {
                     onChange={handleChange}
                     type="password"
                     name="newPasswordConfirm"
-                    label="Repeat Password"
+                    label="Powtórz hasło"
                   ></TextField>
                 </Grid>
                 <Grid item>
@@ -85,7 +85,7 @@ export default () => {
                     variant="contained"
                     style={{ marginLeft: 10 }}
                   >
-                    Reset
+                    Zastosuj
                   </Button>
                 </Grid>
               </Grid>

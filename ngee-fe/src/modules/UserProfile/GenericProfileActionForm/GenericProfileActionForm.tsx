@@ -72,9 +72,7 @@ export default ({ formType, userId, onClose }: IGenericProfileActionForm) => {
                 value={values.password}
                 onChange={handleChange}
                 name="password"
-                label={
-                  formType === 'passwordChange' ? 'New password' : 'Password'
-                }
+                label={formType === 'passwordChange' ? 'Nowe hasło' : 'Hasło'}
               ></TextField>
             </Grid>
             {formType === 'passwordChange' && (
@@ -89,18 +87,18 @@ export default ({ formType, userId, onClose }: IGenericProfileActionForm) => {
                   onChange={handleChange}
                   type="password"
                   name="passwordConfirm"
-                  label="Repeat new password"
+                  label="Powtórz nowe hasło"
                 ></TextField>
               </Grid>
             )}
             <Grid item>
               <Grid container justify="center" spacing={3}>
                 <Grid item>
-                  <Button onClick={() => onClose()}>Cancel</Button>
+                  <Button onClick={() => onClose()}>Anuluj</Button>
                 </Grid>
                 <Grid item>
                   <Button type="submit" variant="contained">
-                    Submit
+                    Zastosuj
                   </Button>
                 </Grid>
               </Grid>

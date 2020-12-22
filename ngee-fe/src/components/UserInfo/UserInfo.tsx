@@ -46,7 +46,9 @@ export default ({
             setAnchorEl(null)
           }}
         >
-          <Link to="/UserProfile">Profile</Link>
+          <Link to="/UserProfile" style={{ color: 'black' }}>
+            Profil
+          </Link>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -54,7 +56,7 @@ export default ({
             setAnchorEl(null)
           }}
         >
-          <Typography>Logout</Typography>
+          <Typography style={{ color: 'red' }}>Wyloguj się</Typography>
         </MenuItem>
       </Menu>
     </div>

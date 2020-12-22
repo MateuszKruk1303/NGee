@@ -47,7 +47,7 @@ export default ({
               <Grid item>
                 <Grid container>
                   <StatusChip
-                    label={closed ? 'closed' : 'open'}
+                    label={closed ? 'zamknięty' : 'otwarty'}
                     status={closed}
                   />
                   <Grid item>
@@ -62,7 +62,7 @@ export default ({
               </Grid>
               <Grid item>
                 <Typography variant="subtitle2">
-                  Category: {category}
+                  Kategoria: {category}
                 </Typography>
               </Grid>
               <Grid item>

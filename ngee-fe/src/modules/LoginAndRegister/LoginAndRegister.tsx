@@ -41,7 +41,7 @@ export default ({ open, onClose }: DialogProps) => {
   return (
     <>
       <GenericDialog
-        title={registerDialog ? 'Register Here' : 'Login Here'}
+        title={registerDialog ? 'Zarejestruj się' : 'Zaloguj się'}
         open={open}
         onClose={onClose}
         disableBackdropClick={true}
@@ -78,7 +78,7 @@ export default ({ open, onClose }: DialogProps) => {
                         value={values.name}
                         onChange={handleChange}
                         name="name"
-                        label="Username"
+                        label="Nazwa użytkownika"
                       ></TextField>
                     </Grid>
                   )}
@@ -86,33 +86,33 @@ export default ({ open, onClose }: DialogProps) => {
                     <TextField
                       variant="outlined"
                       error={
-                        touched.email && Boolean(errors.email) && registerDialog
+                        registerDialog && touched.email && Boolean(errors.email)
                       }
                       helperText={
-                        touched.email && errors.email && registerDialog
+                        registerDialog && touched.email && errors.email
                       }
                       value={values.email}
                       onChange={handleChange}
                       name="email"
-                      label="Email"
+                      label="E-mail"
                     ></TextField>
                   </Grid>
                   <Grid item>
                     <TextField
                       variant="outlined"
                       error={
+                        registerDialog &&
                         touched.password &&
-                        Boolean(errors.password) &&
-                        registerDialog
+                        Boolean(errors.password)
                       }
                       helperText={
-                        touched.password && errors.password && registerDialog
+                        registerDialog && touched.password && errors.password
                       }
                       type="password"
                       value={values.password}
                       onChange={handleChange}
                       name="password"
-                      label="Password"
+                      label="Hasło"
                     ></TextField>
                   </Grid>
                   {registerDialog && (
@@ -130,7 +130,7 @@ export default ({ open, onClose }: DialogProps) => {
                         onChange={handleChange}
                         type="password"
                         name="passwordConfirm"
-                        label="Repeat Password"
+                        label="Powtórz hasło"
                       ></TextField>
                     </Grid>
                   )}
@@ -143,7 +143,7 @@ export default ({ open, onClose }: DialogProps) => {
                         }}
                       >
                         <Typography variant="body2">
-                          Forgot Password?
+                          Zapomniałeś hasła?
                         </Typography>
                       </Button>
                     </Grid>
@@ -152,7 +152,7 @@ export default ({ open, onClose }: DialogProps) => {
                     <Grid item>
                       <Button onClick={() => setRegisterDialog(false)}>
                         <Typography variant="body2">
-                          Already have account? Login here
+                          Masz już konto? Zaloguj się
                         </Typography>
                       </Button>
                     </Grid>
@@ -160,7 +160,7 @@ export default ({ open, onClose }: DialogProps) => {
                     <Grid item>
                       <Button onClick={() => setRegisterDialog(true)}>
                         <Typography variant="body2">
-                          Dont have account yet? register here!
+                          Nie masz konta? Zarejestruj się
                         </Typography>
                       </Button>
                     </Grid>
@@ -170,11 +170,11 @@ export default ({ open, onClose }: DialogProps) => {
               <DialogActions>
                 <Grid container justify="center" spacing={3}>
                   <Grid item>
-                    <Button onClick={() => onClose()}>Cancel</Button>
+                    <Button onClick={() => onClose()}>Anuluj</Button>
                   </Grid>
                   <Grid item>
                     <Button type="submit" variant="contained">
-                      Submit
+                      {registerDialog ? 'Zarejestruj' : 'Zaloguj'}
                     </Button>
                   </Grid>
                 </Grid>

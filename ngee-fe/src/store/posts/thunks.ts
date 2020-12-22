@@ -57,7 +57,7 @@ export const getUserPosts = createAsyncThunk<
 
 export const searchPosts = createAsyncThunk<
   { response: IGetAllPostsResponse },
-  { dto: { keyWord: string; actualPage: number } },
+  { dto: { category: string; keyWord: string; actualPage: number } },
   { rejectValue: any }
 >('searchPosts', async ({ dto }, thunkAPI) => {
   try {

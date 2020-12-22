@@ -37,7 +37,7 @@ import AddPostForm from '../Home/AddNewPost'
 import SpinnerLoader from '../../components/SpinnerLoader'
 
 export const normalizeImagePath = (imagePath: string) => {
-  if (imagePath) return imagePath.split('\\')[imagePath.split('\\').length - 1]
+  if (imagePath) return imagePath.split('/')[imagePath.split('/').length - 1]
   return null
 }
 
@@ -108,9 +108,7 @@ export default () => {
                       />
                     </Grid>
                     <Grid item>
-                      <Typography style={{ paddingLeft: 10 }}>
-                        asking:
-                      </Typography>
+                      <Typography style={{ paddingLeft: 10 }}>pyta:</Typography>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -123,7 +121,7 @@ export default () => {
                     </Grid>
                     <Grid item>
                       <StatusChip
-                        label={post.closed ? 'closed' : 'open'}
+                        label={post.closed ? 'zamknięty' : 'otwarty'}
                         status={post.closed}
                       />
                     </Grid>
@@ -184,7 +182,7 @@ export default () => {
               >
                 <Grid item>
                   <Typography variant="body2" style={{ paddingBottom: 4 }}>
-                    tags:
+                    tagi:
                   </Typography>
                   {post.tags.map((tag, index) => (
                     <TagChip label={tag} index={index}></TagChip>
@@ -203,7 +201,7 @@ export default () => {
                         style={{ padding: 0 }}
                       >
                         <Typography style={{ paddingRight: 3 }}>
-                          Like
+                          Polub
                         </Typography>
                         <FavoriteIcon
                           style={{ color: isLiked() ? 'red' : 'initial' }}
@@ -225,7 +223,7 @@ export default () => {
               </Grid>
             </Grid>
             <Grid item>
-              <Typography variant="h6">Comments:</Typography>
+              <Typography variant="h6">Komentarze:</Typography>
             </Grid>
             <Grid item>
               <Grid container>
@@ -235,7 +233,7 @@ export default () => {
                       <SendIcon />
                     </SendButton>
                     <TextField
-                      placeholder="Add Comment..."
+                      placeholder="Dodaj komentarz..."
                       multiline
                       rows={2}
                       rowsMax={7}
@@ -270,7 +268,7 @@ export default () => {
       </Dialog>
 
       <GenericDialog
-        title="Edit post"
+        title="Edytuj post"
         open={isEditDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         isBig={true}
@@ -288,8 +286,8 @@ export default () => {
         />
       </GenericDialog>
       <Menu open={open} onClose={() => setAnchorEl(null)} anchorEl={anchorEl}>
-        <MenuItem onClick={() => setEditDialogOpen(true)}>Edit post</MenuItem>
-        <MenuItem onClick={handleDeletePost}>Delete post</MenuItem>
+        <MenuItem onClick={() => setEditDialogOpen(true)}>Edytuj post</MenuItem>
+        <MenuItem onClick={handleDeletePost}>Usuń post</MenuItem>
       </Menu>
     </Wrapper>
   )

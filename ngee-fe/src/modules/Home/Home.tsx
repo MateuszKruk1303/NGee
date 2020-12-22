@@ -1,10 +1,16 @@
-import { TextField, Typography, Grid } from '@material-ui/core'
+import { TextField, Typography, Grid, MenuItem } from '@material-ui/core'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllPosts, searchPosts } from '../../store/posts/thunks'
 import { checkIsBanned } from '../../store/login/thunks'
 import { RootState } from '../../store/types'
-import { Wrapper, Button, SearchContainer, SearchButton } from './Home.style'
+import {
+  Wrapper,
+  Button,
+  SearchContainer,
+  SearchButton,
+  Select,
+} from './Home.style'
 import PostContainer from './PostContainer'
 import { Pagination } from '@material-ui/lab'
 import GenericDialog from '../../components/GenericDialog'
@@ -29,7 +35,8 @@ export default () => {
   )
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isLoginDialogOpened, setLoginDialogOpen] = useState(false)
-  const [keyWord, setKeyWord] = useState('')
+  const [keyWord, setKeyWord] = useState<string>('')
+  const [category, setCategory] = useState<string>('')
   const [isSearching, setSearching] = useState(false)
   const [page, setPage] = useState(1)
 
@@ -42,32 +49,52 @@ export default () => {
     <Wrapper>
       <SpinnerLoader isLoading={isLoading} />
       <SearchContainer>
-        <TextField
-          value={keyWord}
-          variant="outlined"
-          onChange={e => setKeyWord(e.target.value)}
-          placeholder="Search post"
-          InputProps={{ startAdornment: <SearchIcon /> }}
-        ></TextField>
+        <div>
+          <Typography>Szukaj w kategorii</Typography>
+          <Select
+            variant="outlined"
+            placeholder="Kategoria"
+            value={category}
+            onChange={e => setCategory(e.target.value as string)}
+          >
+            <MenuItem value="">Brak</MenuItem>
+            <MenuItem value="Automatyka">Automatyka</MenuItem>
+            <MenuItem value="Robotyka">Robotyka</MenuItem>
+            <MenuItem value="Studia">Studia</MenuItem>
+            <MenuItem value="Inne">Inne</MenuItem>
+          </Select>
+        </div>
+        <div>
+          <Typography>Szukaj po frazie</Typography>
+          <TextField
+            value={keyWord}
+            variant="outlined"
+            onChange={e => setKeyWord(e.target.value)}
+            placeholder="Fraza"
+            InputProps={{ startAdornment: <SearchIcon /> }}
+          ></TextField>
+        </div>
         <SearchButton
           variant="contained"
           onClick={() => {
             setSearching(true)
-            dispatch(searchPosts({ dto: { keyWord, actualPage: 1 } }))
+            dispatch(searchPosts({ dto: { category, keyWord, actualPage: 1 } }))
             setPage(1)
           }}
         >
-          <Typography>Search</Typography>
+          <Typography>Szukaj</Typography>
         </SearchButton>
         {isSearching && (
           <SearchButton
             variant="contained"
             onClick={() => {
               setSearching(false)
+              setCategory('')
+              setKeyWord('')
               dispatch(getAllPosts({ dto: { actualPage: 1 } }))
             }}
           >
-            <Typography>Clear</Typography>
+            <Typography>Zakończ</Typography>
           </SearchButton>
         )}
       </SearchContainer>
@@ -76,17 +103,19 @@ export default () => {
       {errorPost && <Snackbar message={errorPost} isError={true} />}
       {userId ? (
         <Button variant="contained" onClick={() => setDialogOpen(true)}>
-          <Typography>Do you have a problem? Ask the question!</Typography>
+          <Typography>Masz problem? Zadaj pytanie</Typography>
         </Button>
       ) : (
         <Button variant="contained" onClick={() => setLoginDialogOpen(true)}>
-          <Typography>Login to as the question!</Typography>
+          <Typography>Zaloguj się aby zadać pytanie</Typography>
         </Button>
       )}
+      <Typography variant="h6">
+        {isSearching ? 'Wyniki wyszukiwania' : 'Najnowsze posty'}
+      </Typography>
       {posts && (
         <>
-          {' '}
-          <PostContainer posts={posts} />{' '}
+          <PostContainer posts={posts} />
         </>
       )}
       {isSearching ? (
@@ -97,7 +126,9 @@ export default () => {
           onChange={(e, page) => {
             setPage(page)
             dispatch(
-              searchPosts({ dto: { keyWord: keyWord, actualPage: page } })
+              searchPosts({
+                dto: { category, keyWord: keyWord, actualPage: page },
+              })
             )
           }}
         ></Pagination>
@@ -114,7 +145,7 @@ export default () => {
       )}
 
       <GenericDialog
-        title="Ask your question"
+        title="Dodaj post"
         open={isDialogOpen}
         onClose={() => setDialogOpen(false)}
         isBig={true}

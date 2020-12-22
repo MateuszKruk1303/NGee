@@ -6,13 +6,13 @@ import { resetPassword } from '../../store/login/thunks'
 export const validationSchema = () =>
   object().shape<IFormValues>({
     newPassword: string()
-      .min(8, 'Your password is too short')
-      .matches(/[a-z]/, 'At least one lowercase character')
-      .matches(/[A-Z]/, 'At least one uppercase character')
-      .matches(/[1-9]/, 'At least one number')
-      .required('Fill this field'),
+      .min(8, 'Hasło jest za krótkie')
+      .matches(/[a-z]/, 'Hasło powinno zawierać małą literę')
+      .matches(/[A-Z]/, 'Hasło powinno zawierać dużą literę')
+      .matches(/[1-9]/, 'Hasło powinno zawierać cyfrę')
+      .required('Uzupełnij to pole'),
     newPasswordConfirm: string()
-      .oneOf([ref('newPassword')], 'Passwords must match')
+      .oneOf([ref('newPassword')], 'Hasła muszą być takie same')
       .required(),
   })
 

@@ -17,26 +17,28 @@ export type formType =
 export const varfieldLabel = (formType: formType) => {
   switch (formType) {
     case 'passwordChange':
-      return 'Old password'
+      return 'Stare hasło'
     case 'emailChange':
-      return 'New email'
+      return 'Nowy e-mail'
     case 'nickChange':
-      return 'New nickname'
+      return 'Nowa nazwa'
     case 'deleteAccount':
     default:
   }
 }
 const varfieldSchema = {
   passwordChange: string()
-    .min(8, 'Your password is too short')
-    .matches(/[a-z]/, 'At least one lowercase character')
-    .matches(/[A-Z]/, 'At least one uppercase character')
-    .matches(/[1-9]/, 'At least one number')
-    .required('Fill this field'),
-  emailChange: string().email('Invalid Email').required('Fill this field'),
+    .min(8, 'Hasło jest za krótkie')
+    .matches(/[a-z]/, 'Hasło powinno zawierać małą literę')
+    .matches(/[A-Z]/, 'Hasło powinno zawierać dużą literę')
+    .matches(/[1-9]/, 'Hasło powinno zawierać cyfrę')
+    .required('Uzupełnij to pole'),
+  emailChange: string()
+    .email('Niepoprawny e-mail')
+    .required('Uzupełnij to pole'),
   nickChange: string()
-    .min(2, 'Your name is too short')
-    .required('Fill this field'),
+    .min(2, 'Nazwa jest zbyt krótka')
+    .required('Uzupełnij to pole'),
 }
 
 export const validationSchema = (formType: formType) =>
@@ -44,15 +46,15 @@ export const validationSchema = (formType: formType) =>
     varField:
       formType === 'deleteAccount' ? string() : varfieldSchema[formType],
     password: string()
-      .min(8, 'Your password is too short')
-      .matches(/[a-z]/, 'At least one lowercase character')
-      .matches(/[A-Z]/, 'At least one uppercase character')
-      .matches(/[1-9]/, 'At least one number')
-      .required('Fill this field'),
+      .min(8, 'Hasło jest za krótkie')
+      .matches(/[a-z]/, 'Hasło powinno zawierać małą literę')
+      .matches(/[A-Z]/, 'Hasło powinno zawierać dużą literę')
+      .matches(/[1-9]/, 'Hasło powinno zawierać cyfrę')
+      .required('Uzupełnij to pole'),
     passwordConfirm:
       formType === 'passwordChange'
         ? string()
-            .oneOf([ref('password')], 'Passwords must match')
+            .oneOf([ref('password')], 'Hasła muszą być takie same')
             .required()
         : string(),
   })

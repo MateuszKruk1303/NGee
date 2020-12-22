@@ -83,8 +83,8 @@ export default () => {
         </Grid>
         <Grid item>
           <ProfileActionsCard
-            title="Change profile photo"
-            actionTitle="Click to change your photo"
+            title="Zmień zdjęcie profilowe"
+            actionTitle="Kliknij aby zmienić zdjęcie"
             actionsAvailable={true}
             onButtonClick={handleUploadPhoto}
             disabled={!selectedFile}
@@ -100,7 +100,7 @@ export default () => {
         </Grid>
         <Grid item>
           <ProfileActionsCard
-            title="Change your email"
+            title="Zmień swój e-mail"
             actionsAvailable={false}
           >
             <Button
@@ -110,31 +110,26 @@ export default () => {
               }}
             >
               <Typography variant="body2">
-                Click to change your email
+                Kliknij aby zmienić swój e-mail
               </Typography>
             </Button>
           </ProfileActionsCard>
         </Grid>
         <Grid item>
-          <ProfileActionsCard
-            title="Change your password"
-            actionsAvailable={false}
-          >
+          <ProfileActionsCard title="Zmień hasło" actionsAvailable={false}>
             <Button
               variant="contained"
               onClick={() => {
                 setPasswordChangeDialog(true)
               }}
             >
-              <Typography variant="body2">
-                Click to change your password
-              </Typography>
+              <Typography variant="body2">Kliknij aby zmienić hasło</Typography>
             </Button>
           </ProfileActionsCard>
         </Grid>
         <Grid item>
           <ProfileActionsCard
-            title="Change your nickname"
+            title="Zmień swoją nazwę użytkownika"
             actionsAvailable={false}
           >
             <Button
@@ -143,17 +138,12 @@ export default () => {
                 setNicknameChangeDialog(true)
               }}
             >
-              <Typography variant="body2">
-                Click to change your nickname
-              </Typography>
+              <Typography variant="body2">Kliknij aby zmienić nazwę</Typography>
             </Button>
           </ProfileActionsCard>
         </Grid>
         <Grid item>
-          <ProfileActionsCard
-            title="Delete your account"
-            actionsAvailable={false}
-          >
+          <ProfileActionsCard title="Usuń swoje konto" actionsAvailable={false}>
             <Button
               variant="contained"
               onClick={() => {
@@ -161,7 +151,7 @@ export default () => {
               }}
             >
               <Typography variant="body2">
-                Click to Delete your account
+                Kliknij aby usunąć swoje konto
               </Typography>
             </Button>
           </ProfileActionsCard>
@@ -171,11 +161,11 @@ export default () => {
             <AdminPanel>
               <Grid container direction="column" alignItems="center">
                 <Grid item>
-                  <Typography variant="h6">Ban user</Typography>
+                  <Typography variant="h6">Zablokuj użytkownika</Typography>
                 </Grid>
                 <Grid item>
                   <TextField
-                    placeholder="User name"
+                    placeholder="Nazwa użytkownika"
                     value={userToBan}
                     variant="outlined"
                     onChange={e => {
@@ -185,7 +175,7 @@ export default () => {
                 </Grid>
                 <Grid item>
                   <TextField
-                    placeholder="Admin password"
+                    placeholder="Hasło administratora"
                     type="password"
                     variant="outlined"
                     value={adminPassword}
@@ -196,7 +186,7 @@ export default () => {
                 </Grid>
                 <Grid item>
                   <Button variant="contained" onClick={handleBanUser}>
-                    Ban user
+                    Zablokuj użytkownika
                   </Button>
                 </Grid>
               </Grid>
@@ -205,7 +195,7 @@ export default () => {
         </Grid>
       </Grid>
       <PostWrapper>
-        <Typography variant="h6">Your posts: </Typography>
+        <Typography variant="h6">Twoje posty: </Typography>
         {posts?.length ? (
           <>
             <PostContainer posts={posts} />
@@ -221,7 +211,7 @@ export default () => {
           </>
         ) : (
           <Typography style={{ paddingTop: 20 }} variant="body1">
-            You haven't added any post yet
+            Nie dodano jeszcze żadnych postów
           </Typography>
         )}
       </PostWrapper>
@@ -230,7 +220,7 @@ export default () => {
         onClose={() => {
           setEmailChangeDialog(false)
         }}
-        title="Change your email"
+        title="Zmień swój e-mail"
       >
         <ProfileActionForm
           onClose={() => setEmailChangeDialog(false)}
@@ -243,7 +233,7 @@ export default () => {
         onClose={() => {
           setPasswordChangeDialog(false)
         }}
-        title="Change your password"
+        title="Zmień swoje hasło"
       >
         <ProfileActionForm
           onClose={() => setPasswordChangeDialog(false)}
@@ -256,7 +246,7 @@ export default () => {
         onClose={() => {
           setNicknameChangeDialog(false)
         }}
-        title="Change your nickname"
+        title="Zmień nazwę użytkownika"
       >
         <ProfileActionForm
           onClose={() => setNicknameChangeDialog(false)}
@@ -269,7 +259,7 @@ export default () => {
         onClose={() => {
           setDeleteAccountDialog(false)
         }}
-        title="Delete your account"
+        title="Usuń swoje konto"
       >
         <ProfileActionForm
           onClose={() => setDeleteAccountDialog(false)}

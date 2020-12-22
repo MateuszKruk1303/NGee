@@ -31,7 +31,11 @@ export const postApi = (
   async getUserPosts(data: { actualPage: number; userId: string }) {
     return axiosInstanceAuth.post(apiPaths.getUserPosts, data)
   },
-  async searchPosts(data: { keyWord: string; actualPage: number }) {
+  async searchPosts(data: {
+    category: string
+    keyWord: string
+    actualPage: number
+  }) {
     return axiosInstance.post(apiPaths.searchPosts, data)
   },
   async addNewPost(data: FormData) {

@@ -16,7 +16,7 @@ export default () => {
 
   return (
     <div>
-      <Typography variant="body1">Activated!</Typography>
+      <Typography variant="body1">Aktywowany!</Typography>
     </div>
   )
 }

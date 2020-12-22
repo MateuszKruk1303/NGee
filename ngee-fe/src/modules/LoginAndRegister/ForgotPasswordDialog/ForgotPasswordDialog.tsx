@@ -22,7 +22,7 @@ export default ({ open, onClose }: IForgotPasswordDialog) => {
   return (
     <GenericDialog
       open={open}
-      title="Reset your password"
+      title="Zresetuj swoje hasło"
       onClose={onClose}
       disableBackdropClick
     >
@@ -45,7 +45,7 @@ export default ({ open, onClose }: IForgotPasswordDialog) => {
                   value={values.email}
                   onChange={handleChange}
                   name="email"
-                  label="email"
+                  label="E-mail"
                 />
               </Grid>
               <Grid item>
@@ -57,7 +57,7 @@ export default ({ open, onClose }: IForgotPasswordDialog) => {
                       }}
                       style={{ marginRight: 10 }}
                     >
-                      Cancel
+                      Anuluj
                     </Button>
                   </Grid>
                   <Grid item>
@@ -66,7 +66,7 @@ export default ({ open, onClose }: IForgotPasswordDialog) => {
                       variant="contained"
                       style={{ marginLeft: 10 }}
                     >
-                      Send
+                      Wyślij
                     </Button>
                   </Grid>
                 </Grid>
