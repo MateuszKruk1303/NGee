@@ -22,13 +22,13 @@ export abstract class PostController {
       res.status(200).json({ data, numberOfPosts })
     } catch (err) {
       console.log(err)
-      res.status(500).json({ error: err })
+      res.status(500).json({ error: 'Błąd' })
     }
   }
   public static async getPostById(req: Request, res: Response, next: any) {
     try {
       const { postId } = req.body
-      if (!postId) throw 'error'
+      if (!postId) throw 'Błąd'
       const data = await PostModel.findOne({ _id: postId })
         .populate({
           path: 'createdBy',
@@ -68,7 +68,7 @@ export abstract class PostController {
   public static async addNewPost(req: Request, res: Response, next: any) {
     try {
       const { title, content, userId, category, tags } = req.body
-      if (!userId || !title || !content || !category) throw 'error'
+      if (!userId || !title || !content || !category) throw 'Błąd'
       const newPost = await PostModel.create({
         title: title,
         content: content,
@@ -100,10 +100,11 @@ export abstract class PostController {
   public static async addVote(req: Request, res: Response, next: any) {
     try {
       const { userId, postId } = req.body
-      if (!userId || !postId) throw 'error'
+      if (!userId || !postId) throw 'Błąd'
       const post = (await PostModel.findById(postId)) as IPostModel
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!post || !user) throw 'There is no post with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
+      if (!post) throw 'Post nie istnieje'
       if (post.votes.includes(userId)) {
         await PostModel.updateOne(
           { _id: postId },
@@ -114,19 +115,14 @@ export abstract class PostController {
         })
       } else {
         if (post.createdBy != userId) {
-          console.log(postId)
-          console.log(userId)
-          console.log(`${user.name} likes your post`)
+          console.log(`${user.name} polubił twój post`)
           const isDuplicate = await NotificationModel.find({
             postId: postId,
-            content: `${user.name} likes your post`,
+            content: `${user.name} polubił twój post`,
           })
-          console.log(isDuplicate)
-          console.log(isDuplicate.length)
-          console.log(!isDuplicate.length)
           if (!isDuplicate.length) {
             await NotificationModel.create({
-              content: `${user.name} likes your post`,
+              content: `${user.name} polubił twój post`,
               date: new Date(Date.now()),
               postId: postId,
               watched: false,
@@ -134,7 +130,6 @@ export abstract class PostController {
             })
           }
         }
-
         await PostModel.updateOne(
           { _id: postId },
           { $set: { votes: [...post.votes, userId] } }
@@ -150,10 +145,10 @@ export abstract class PostController {
   public static async deletePost(req: Request, res: Response, next: any) {
     try {
       const { userId, postId } = req.body
-      if (!userId || !postId) throw 'error'
+      if (!userId || !postId) throw 'Błąd'
       const post = (await PostModel.findById(postId)) as IPostModel
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!post) throw 'There is no post with this id'
+      if (!post) throw 'Post nie istnieje'
       if (post.createdBy == userId || user.isAdmin) {
         await Promise.all(
           post.comments.map(async (comment) => {
@@ -162,7 +157,7 @@ export abstract class PostController {
         )
         await PostModel.deleteOne({ _id: postId })
         res.status(201).json({ data: 'success' })
-      } else throw 'You cant delete this post'
+      } else throw 'Nie możesz usunąć tego posta'
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: err })
@@ -172,10 +167,10 @@ export abstract class PostController {
   public static async editPost(req: Request, res: Response, next: any) {
     try {
       const { userId, postId, title, content, category, tags } = req.body
-      if (!userId || !postId || !title || !content || !category) throw 'error'
+      if (!userId || !postId || !title || !content || !category) throw 'Błąd'
       const post = (await PostModel.findById(postId)) as IPostModel
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!post) throw 'There is no post with this id'
+      if (!post) throw 'Post nie istnieje'
       if (post.createdBy == userId || user.isAdmin) {
         await PostModel.updateOne(
           { _id: postId },
@@ -189,7 +184,7 @@ export abstract class PostController {
           }
         )
         res.status(201).json({ data: { title, content, category, tags } })
-      } else throw 'You cant edit this post'
+      } else throw 'Nie możesz edytować tego posta'
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: err })
@@ -198,20 +193,23 @@ export abstract class PostController {
 
   public static async searchEngine(req: Request, res: Response, next: any) {
     try {
-      const { keyWord, actualPage } = req.body
-      if (!keyWord || !actualPage) throw 'error'
+      const { category, keyWord, actualPage } = req.body
+      if (!actualPage) throw 'Błąd'
       const tagSearchedPosts = (await PostModel.find({
         tags: { $in: keyWord },
+        category: { $regex: category, $options: 'i' },
       })) as IPostModel[]
       const titleSearchedPosts = (await PostModel.find({
         title: { $regex: keyWord, $options: 'i' },
+        category: { $regex: category, $options: 'i' },
       })) as IPostModel[]
       console.log(titleSearchedPosts)
       const contentSearchedPosts = (await PostModel.find({
         content: { $regex: keyWord, $options: 'i' },
+        category: { $regex: category, $options: 'i' },
       })) as IPostModel[]
       if (!titleSearchedPosts && !tagSearchedPosts && contentSearchedPosts)
-        throw "Couldn't find any post"
+        throw 'Nie znaleziono żadnego posta'
       const allPostIds = [
         ...tagSearchedPosts,
         ...titleSearchedPosts,

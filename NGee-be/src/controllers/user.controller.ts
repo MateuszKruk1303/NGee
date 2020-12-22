@@ -24,15 +24,15 @@ export class UserController {
   public static async signUp(req: Request, res: Response) {
     try {
       const { name, email, photo, password, passwordConfirm } = req.body
-      if (!name || !email || !password || !passwordConfirm) throw 'error'
+      if (!name || !email || !password || !passwordConfirm) throw 'Błąd'
       const isEmailTaken = (await UserModel.findOne({
         email: email,
       })) as IUserModel
-      if (isEmailTaken) throw 'This email is taken'
+      if (isEmailTaken) throw 'E-mail jest zajęty'
       const isNameTaken = (await UserModel.findOne({
         name: name,
       })) as IUserModel
-      if (isNameTaken) throw 'This nickname is taken'
+      if (isNameTaken) throw 'Nazwa użytkownika jest zajęta'
       const activationHash = v4()
       await UserModel.create({
         name: name,
@@ -48,7 +48,7 @@ export class UserController {
       await mailSender(
         email,
         `${process.env.FRONTEND_URL}/activate/${activationHash}`,
-        'Activate your account here'
+        'Aktywuj swoje konto klikając tutaj'
       )
       res.status(201).json({ status: 'Success' })
     } catch (err) {
@@ -59,19 +59,19 @@ export class UserController {
   public static async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body
-      if (!email || !password) throw 'password and email are required'
-      const user: IUserModel | null = (await UserModel.findOne({
+      if (!email || !password) throw 'e-mail i hasło są wymagane'
+      const user: IUserModel = (await UserModel.findOne({
         email: email,
       })) as IUserModel
-      if (!user || !user.activated) throw 'User does not exist'
-      if (user.isBanned) throw 'User is banned'
+      if (!user || !user.activated) throw 'Użytkownik nie istnieje'
+      if (user.isBanned) throw 'Użytkownik jest zablokowany'
       //Never trust error with await like below.
       const correct: boolean = await user.comparePasswords(
         password,
         user.password
       )
       if (correct) {
-        const token = generateJwt(user.id)
+        const token = generateJwt(user.id as string) as string
         res.status(201).json({
           token,
           data: {
@@ -81,7 +81,7 @@ export class UserController {
             isAdmin: user.isAdmin,
           },
         })
-      } else throw 'Wrong password or email'
+      } else throw 'Złe hasło lub e-mail'
     } catch (err) {
       console.log(err)
       res.status(500).json({ error: err })
@@ -94,7 +94,7 @@ export class UserController {
       const user = (await UserModel.findOne({
         accountActivationHash: activationHash,
       })) as IUserModel
-      if (!user) throw 'Fail - user does not exist'
+      if (!user) throw 'Użytkownik nie istnieje'
       await UserModel.updateOne(
         { accountActivationHash: activationHash },
         { $set: { activated: true } }
@@ -107,11 +107,11 @@ export class UserController {
   }
   public static async uploadPhoto(req: Request, res: Response) {
     try {
-      if (!req.body.userId) throw 'error'
+      if (!req.body.userId) throw 'Błąd'
       const user = (await UserModel.findOne({
         _id: req.body.userId,
       })) as IUserModel
-      if (!user) throw 'Fail'
+      if (!user) throw 'Użytkownik nie istnieje'
       const newPath = await processProfilePhoto(
         req.file.path,
         req.file.destination,
@@ -131,24 +131,24 @@ export class UserController {
   public static async changeEmail(req: Request, res: Response) {
     try {
       const { userId, email, password } = req.body
-      if (!email || !password || !userId) throw 'error'
+      if (!email || !password || !userId) throw 'Błąd'
       const activationHash = v4()
 
       const user = (await UserModel.findOne({
         _id: userId,
       })) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       const isEmailTaken = (await UserModel.findOne({
         email: email,
       })) as IUserModel
 
-      if (isEmailTaken) throw 'Email taken'
+      if (isEmailTaken) throw 'E-mail jest zajęty'
       //Never trust error with await like below.
       const correct: boolean = await user!.comparePasswords(
         password,
         user.password
       )
-      if (!correct) throw 'Wrong Password'
+      if (!correct) throw 'Złe hasło'
       await UserModel.updateOne(
         { _id: userId },
         {
@@ -162,7 +162,7 @@ export class UserController {
       await mailSender(
         email,
         `${process.env.FRONTEND_URL}/activate/${activationHash}`,
-        'Activate your account here'
+        'Aktywuj swoje konto klikając tutaj'
       )
       res.status(201).json({ status: 'Success' })
     } catch (err) {
@@ -178,15 +178,14 @@ export class UserController {
       const user = (await UserModel.findOne({
         _id: userId,
       })) as IUserModel
-      console.log(req.body)
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       //Never trust error with await like below.
       const correct: boolean = await user!.comparePasswords(
         oldPassword,
         user.password
       )
       console.log(correct)
-      if (!correct || newPassword !== newPasswordConfirm) throw 'Wrong Password'
+      if (!correct || newPassword !== newPasswordConfirm) throw 'Złe hasło'
       const test = await UserModel.updateOne(
         { _id: userId },
         {
@@ -206,19 +205,19 @@ export class UserController {
   public static async changeNickname(req: Request, res: Response) {
     try {
       const { userId, newNickname, password } = req.body
-      if (!newNickname || !password || !userId) throw 'error'
+      if (!newNickname || !password || !userId) throw 'Błąd'
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       //Never trust error with await like below.
       const correct: boolean = await user!.comparePasswords(
         password,
         user.password
       )
-      if (!correct) throw 'Wrong Password'
+      if (!correct) throw 'Złe hasło'
       const isNameTaken = (await UserModel.findOne({
         name: newNickname,
       })) as IUserModel
-      if (isNameTaken) throw 'This nickname is taken'
+      if (isNameTaken) throw 'Nazwa użytkownika jest zajęta'
       await UserModel.updateOne(
         { _id: userId },
         { $set: { name: newNickname } }
@@ -232,15 +231,15 @@ export class UserController {
   public static async deleteAccount(req: Request, res: Response) {
     try {
       const { userId, password } = req.body
-      if (!userId || !password) throw 'error'
+      if (!userId || !password) throw 'Błąd'
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       //Never trust error with await like below.
       const correct: boolean = await user!.comparePasswords(
         password,
         user.password
       )
-      if (!correct) throw 'Wrong Password'
+      if (!correct) throw 'Złe hasło'
       const userPosts = await PostModel.find({ createdBy: userId })
       const userComments = await CommentModel.find({ createdBy: userId })
       await Promise.all(
@@ -264,11 +263,11 @@ export class UserController {
   public static async orderResetPassword(req: Request, res: Response) {
     try {
       const { email } = req.body
-      if (!email) throw 'error'
+      if (!email) throw 'Błąd'
       const user = (await UserModel.findOne({
         email,
       })) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       const emergencyId = v4()
       await UserModel.updateOne(
         { _id: user.id },
@@ -277,7 +276,7 @@ export class UserController {
       await mailSender(
         email,
         `${process.env.FRONTEND_URL}/resetpassword/${emergencyId}`,
-        'Reset your password here'
+        'Zresetuj swoje hasło klikając tutaj'
       )
       res.status(201).json({ status: 'Success' })
     } catch (err) {
@@ -289,12 +288,12 @@ export class UserController {
   public static async resetPassword(req: Request, res: Response) {
     try {
       const { emergencyId, newPassword, newPasswordConfirm } = req.body
-      if (!emergencyId || !newPassword || !newPasswordConfirm) throw 'error'
+      if (!emergencyId || !newPassword || !newPasswordConfirm) throw 'Błąd'
       const user = (await UserModel.findOne({
         emergencyId: emergencyId,
       })) as IUserModel
-      if (!user) throw 'There is no user with this id'
-      if (newPassword !== newPasswordConfirm) throw 'Passwords are wrong'
+      if (!user) throw 'Użytkownik nie istnieje'
+      if (newPassword !== newPasswordConfirm) throw 'Hasła się nie zgadzają'
       await UserModel.updateOne(
         {
           _id: user.id,
@@ -316,9 +315,9 @@ export class UserController {
   public static async notificationUpdate(req: Request, res: Response) {
     try {
       const { userId, notificationId } = req.body
-      if (!userId) throw 'error'
+      if (!userId) throw 'Błąd'
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       await NotificationModel.updateOne(
         {
           _id: notificationId,
@@ -339,7 +338,7 @@ export class UserController {
   public static async getNotifications(req: Request, res: Response) {
     try {
       const { userId } = req.body
-      if (!userId) throw 'error'
+      if (!userId) throw 'Błąd'
       const notifications = ((await NotificationModel.find(
         {
           userId: userId,
@@ -363,11 +362,11 @@ export class UserController {
   public static async makeUserAdmin(req: Request, res: Response) {
     try {
       const { userId, adminPassword } = req.body
-      if (!adminPassword || !userId) throw 'error'
+      if (!adminPassword || !userId) throw 'Błąd'
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!user) throw 'There is no user with this id'
+      if (!user) throw 'Użytkownik nie istnieje'
       const correct: boolean = adminPassword == process.env['ADMIN_PASSWORD']
-      if (!correct) throw 'Wrong Password'
+      if (!correct) throw 'Złe hasło'
       await UserModel.updateOne({ _id: userId }, { $set: { isAdmin: true } })
       res.status(201).json({ status: 'success' })
     } catch (err) {
@@ -379,13 +378,13 @@ export class UserController {
   public static async banUser(req: Request, res: Response) {
     try {
       const { name, adminPassword } = req.body
-      if (!adminPassword || !name) throw 'error'
+      if (!adminPassword || !name) throw 'Błąd'
       const user = ((await UserModel.findOne({
         name: name,
       })) as unknown) as IUserModel
-      if (!user) throw 'There is no user with this name'
+      if (!user) throw 'Użytkownik nie istnieje'
       const correct: boolean = adminPassword == process.env['ADMIN_PASSWORD']
-      if (!correct) throw 'Wrong Password'
+      if (!correct) throw 'Złe hasło administratora'
       await UserModel.updateOne({ name: name }, { $set: { isBanned: true } })
       res.status(201).json({ status: 'success' })
     } catch (err) {
@@ -397,9 +396,9 @@ export class UserController {
   public static async checkIsBanned(req: Request, res: Response) {
     try {
       const { userId } = req.body
-      if (!userId) throw 'error'
+      if (!userId) throw 'Błąd'
       const user = (await UserModel.findById(userId)) as IUserModel
-      if (!user) throw 'There is no user with this name'
+      if (!user) throw 'Użytkownik nie istnieje'
       res.status(201).json({ isBanned: user.isBanned })
     } catch (err) {
       console.log(err)
@@ -419,18 +418,22 @@ export class UserController {
         req.headers.authorization.startsWith('Bearer ')
       ) {
         const token = req.headers.authorization.split(' ')[1]
-        if (!token) throw 'Token not found, please log in'
-
-        const verified = ((await promisify(jwt.verify)(
+        if (!token) throw 'Nie znaleziono tokenu. Zaloguj się'
+        const test = promisify(jwt.verify).bind(jwt)
+        const verified = jwt.verify(
           token,
           process.env['JWT_SECRET'] as string
-        )) as unknown) as { id: string; iat: number; exp: number }
+        ) as { id: string; iat: number; exp: number }
+        // const verified = ((await promisify(jwt.verify).bind(jwt)(
+        //   token,
+        //   process.env['JWT_SECRET'] as string
+        // )) as any) as { id: string; iat: number; exp: number }
 
         const isUserAlive = await UserModel.findById(verified.id)
 
-        if (!isUserAlive) throw 'there is no user with that id'
+        if (!isUserAlive) throw 'Użytkownik nie istnieje'
       } else {
-        throw 'token is required'
+        throw 'Token jest wymagany'
       }
     } catch (err) {
       console.log(err)

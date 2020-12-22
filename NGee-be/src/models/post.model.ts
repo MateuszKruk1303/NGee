@@ -1,13 +1,11 @@
 import { Schema, model, Document } from 'mongoose'
 
-type category = 'PLC' | 'Robotics' | 'Automotive' | 'Student'
-
 export interface IPostModel extends Document {
   title: string
   content: string
   photos: string[]
   createdBy: string
-  category: category
+  category: string
   votes: string[]
   tags: string[]
   comments: []
@@ -16,11 +14,11 @@ export interface IPostModel extends Document {
 const postSchema: Schema = new Schema({
   title: {
     type: String,
-    required: [true, 'title is required'],
+    required: true,
   },
   content: {
     type: String,
-    required: [true, 'content is required'],
+    required: true,
   },
   photos: {
     type: Array,
@@ -31,7 +29,7 @@ const postSchema: Schema = new Schema({
   },
   category: {
     type: String,
-    required: [true, 'category is required'],
+    required: true,
   },
   votes: {
     type: Array,
@@ -53,4 +51,4 @@ const postSchema: Schema = new Schema({
   ],
 })
 
-export const PostModel = model('Post', postSchema)
+export const PostModel = model<any>('Post', postSchema)

@@ -9,7 +9,7 @@ export interface ICommentModel extends Document {
 const commentSchema: Schema = new Schema({
   content: {
     type: String,
-    required: [true, 'content is required'],
+    required: [true, 'Zawartość jest wymagana'],
   },
   votes: {
     type: Array,
@@ -26,4 +26,4 @@ const commentSchema: Schema = new Schema({
   },
 })
 
-export const CommentModel = model('Comment', commentSchema)
+export const CommentModel = model<any>('Comment', commentSchema)

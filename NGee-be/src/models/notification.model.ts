@@ -11,7 +11,7 @@ export interface INotificationModel extends Document {
 const notificationSchema: Schema = new Schema({
   content: {
     type: String,
-    required: [true, 'content is required'],
+    required: true,
   },
   date: {
     type: Date,
@@ -27,4 +27,4 @@ const notificationSchema: Schema = new Schema({
   },
 })
 
-export const NotificationModel = model('Notification', notificationSchema)
+export const NotificationModel = model<any>('Notification', notificationSchema)

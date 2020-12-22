@@ -6,7 +6,6 @@ import { ServerError, ErrorHandler } from './utils/serverError'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import path from 'path'
-import bodyParser from 'body-parser'
 
 dotenv.config({ path: './process.env' })
 
@@ -30,11 +29,11 @@ app.use('/user', userRoutes)
 app.use('/posts', postRoutes)
 
 app.all('*', (req, res, next) => {
-  next(new ServerError(`can't find ${req.originalUrl}!`, 404))
+  next(new ServerError(`Nie znaleziono ${req.originalUrl}!`, 404))
 })
 
 app.use(ErrorHandler)
 
 app.listen(process.env['PORT'], () => {
-  console.log(`server listening at port ${process.env['PORT']}`)
+  console.log(`Serwer wystartował na porcie ${process.env['PORT']}`)
 })

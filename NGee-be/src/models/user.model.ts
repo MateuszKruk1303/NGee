@@ -19,13 +19,13 @@ export interface IUserModel extends Document {
 const userSchema: Schema = new Schema({
   name: {
     type: String,
-    required: [true, 'name is required'],
-    unique: [true, 'this nickname is taken'],
+    required: true,
+    unique: true,
   },
   email: {
     type: String,
-    required: [true, 'name is required'],
-    unique: [true, 'this email is taken'],
+    required: true,
+    unique: true,
     lowercase: true,
   },
   photo: {
@@ -34,17 +34,17 @@ const userSchema: Schema = new Schema({
   },
   password: {
     type: String,
-    required: [true, 'password is required'],
+    required: true,
     minlength: 8,
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'confirm your password'],
+    required: true,
     validate: {
       validator: async function (this: IUserModel, el: string) {
         return await (el === this.password)
       },
-      message: 'passwords are not the same!',
+      message: 'Hasła się nie zgadzają',
     },
   },
   accountActivationHash: {
@@ -83,4 +83,4 @@ userSchema.methods.comparePasswords = async function (
   return bcrypt.compare(incomingPassword, userPassword) as Promise<boolean>
 }
 
-export const UserModel = model('User', userSchema)
+export const UserModel = model<any>('User', userSchema)
